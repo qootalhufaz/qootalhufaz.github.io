@@ -431,6 +431,11 @@
   const searchBtn = document.getElementById('searchBtn');
   const resultsArea = document.getElementById('resultsArea');
 
+  const PAGE_SIZE = 20;
+  let currentMatches = [];
+  let currentRawQuery = '';
+  let shownCount = 0;
+
   function runSearch(){
     const raw = searchInput.value.trim();
     if(!raw){
@@ -441,27 +446,49 @@
     const query = normalize(raw);
     const paddedQuery = ' ' + query + ' ';
 
-    const matches = quranData.filter(ayah => {
+    currentMatches = quranData.filter(ayah => {
       const paddedText = ' ' + normalize(ayah.text_plain) + ' ';
       return paddedText.includes(paddedQuery);
     });
+    currentRawQuery = raw;
+    shownCount = 0;
 
-    if(matches.length === 0){
+    if(currentMatches.length === 0){
       resultsArea.innerHTML = '<div class="empty-state">لا توجد آيات تحتوي على هذه الكلمة أو العبارة بالضبط.</div>';
       return;
     }
 
-    let html = `<div class="results-meta">عدد النتائج: <strong>${matches.length}</strong></div>`;
-    matches.forEach(ayah => {
+    resultsArea.innerHTML = `<div class="results-meta">عدد النتائج: <strong>${currentMatches.length}</strong></div><div id="resultsList"></div>`;
+    renderNextBatch();
+  }
+
+  function renderNextBatch(){
+    const listEl = document.getElementById('resultsList');
+    const nextSlice = currentMatches.slice(shownCount, shownCount + PAGE_SIZE);
+
+    let html = '';
+    nextSlice.forEach(ayah => {
       const surahName = surahNames[ayah.sura] || ('سورة رقم ' + ayah.sura);
-      const highlighted = highlightPhrase(ayah.text, raw);
+      const highlighted = highlightPhrase(ayah.text, currentRawQuery);
       html += `
         <div class="result-card">
           <div class="result-ref">سورة ${surahName}، آية ${ayah.aya}</div>
           <div class="result-text quran-text">${highlighted}</div>
         </div>`;
     });
-    resultsArea.innerHTML = html;
+    listEl.insertAdjacentHTML('beforeend', html);
+    shownCount += nextSlice.length;
+
+    // إزالة زر "تحميل المزيد" القديم إن وجد، وإضافة زر جديد إن بقيت نتائج
+    const oldBtn = document.getElementById('loadMoreBtn');
+    if(oldBtn) oldBtn.remove();
+
+    if(shownCount < currentMatches.length){
+      const remaining = currentMatches.length - shownCount;
+      const btnHtml = `<button id="loadMoreBtn" class="quiz-btn" style="display:block;margin:20px auto 0;">تحميل المزيد (${remaining} متبقية)</button>`;
+      resultsArea.insertAdjacentHTML('beforeend', btnHtml);
+      document.getElementById('loadMoreBtn').addEventListener('click', renderNextBatch);
+    }
   }
 
   // تمييز العبارة المطابقة (كلمة أو أكثر) داخل النص المُشكَّل

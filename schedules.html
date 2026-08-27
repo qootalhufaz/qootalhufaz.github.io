@@ -6,80 +6,7 @@
 <title>جداول الحفظ والمراجعة | قوت الحفاظ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --navy-deep:#0f2e21;
-    --navy:#164a35;
-    --gold:#b8923f;
-    --gold-light:#d8b978;
-    --paper:#faf8f3;
-    --ink:#1c2733;
-    --ink-soft:#4a5866;
-    --line:#e4ddca;
-    --panel:#ffffff;
-    --green-tint:#eef4ee;
-  }
-  *{box-sizing:border-box; margin:0; padding:0;}
-  html{scroll-behavior:smooth;}
-  body{ background:var(--paper); color:var(--ink); font-family:'Tajawal', sans-serif; line-height:1.85; }
-  h1,h2,h3{ font-family:'Amiri', serif; font-weight:700; color:var(--navy-deep); }
-  a{color:inherit; text-decoration:none;}
-
-  header{ background:var(--navy-deep); border-bottom:3px solid var(--gold); }
-  .top-bar{ max-width:1140px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; padding:20px 24px; }
-  .brand{color:var(--gold-light); font-family:'Amiri',serif; font-size:1.7rem; font-weight:700;}
-  .brand small{display:block; color:#c7d0da; font-family:'Tajawal',sans-serif; font-size:0.78rem; font-weight:300; letter-spacing:1px; margin-top:2px;}
-  nav.main-nav{background:var(--navy);}
-  .main-nav ul{ max-width:1140px; margin:0 auto; padding:0 24px; display:flex; list-style:none; gap:2px; flex-wrap:wrap; }
-  .main-nav a{ display:block; padding:14px 18px; color:#dfe6ee; font-size:0.95rem; border-bottom:3px solid transparent; transition:.2s; }
-  .main-nav a:hover, .main-nav a.active{background:rgba(255,255,255,0.06); border-bottom-color:var(--gold);}
-
-  .page-head{ background:var(--panel); border-bottom:1px solid var(--line); padding:44px 24px; text-align:center; }
-  .page-head h1{font-size:1.9rem; margin-bottom:10px;}
-  .page-head p{color:var(--ink-soft); max-width:600px; margin:0 auto;}
-
-  section{max-width:1140px; margin:0 auto; padding:50px 24px;}
-  .section-title{ display:flex; align-items:baseline; gap:14px; margin-bottom:8px; border-bottom:2px solid var(--line); padding-bottom:14px; }
-  .section-title h2{font-size:1.5rem;}
-  .section-title .num{color:var(--gold); font-size:1rem; font-family:'Tajawal',sans-serif;}
-  .section-desc{color:var(--ink-soft); margin:14px 0 30px; max-width:680px;}
-
-  /* Tab buttons */
-  .tab-row{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:26px; }
-  .tab-btn{
-    background:var(--panel); border:1px solid var(--line); color:var(--ink);
-    padding:11px 22px; border-radius:24px; font-size:0.92rem; font-weight:500;
-    cursor:pointer; transition:.2s; font-family:'Tajawal',sans-serif;
-  }
-  .tab-btn:hover{border-color:var(--navy); color:var(--navy-deep);}
-  .tab-btn.active{background:var(--navy-deep); color:#fff; border-color:var(--navy-deep);}
-
-  .plan-panel{ display:none; background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:30px; animation:fade .35s ease; }
-  .plan-panel.show{display:block;}
-  @keyframes fade{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
-
-  .plan-header{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:20px; padding-bottom:16px; border-bottom:1px dashed var(--line); }
-  .plan-header h3{font-size:1.25rem;}
-  .badge{ background:var(--green-tint); color:var(--navy-deep); border:1px solid var(--line); padding:6px 14px; border-radius:20px; font-size:0.85rem; font-weight:500; }
-
-  .stat-row{ display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; margin-bottom:24px; }
-  .stat-box{ background:var(--green-tint); border-radius:5px; padding:16px; text-align:center; }
-  .stat-box .val{ font-family:'Amiri',serif; font-size:1.5rem; color:var(--navy-deep); font-weight:700; }
-  .stat-box .lbl{ font-size:0.8rem; color:var(--ink-soft); margin-top:4px; }
-
-  table.week-table{ width:100%; border-collapse:collapse; font-size:0.9rem; }
-  table.week-table th{ background:var(--navy-deep); color:#fff; padding:10px; font-weight:500; font-size:0.85rem; }
-  table.week-table td{ padding:11px 10px; border-bottom:1px solid var(--line); text-align:center; color:var(--ink-soft); }
-  table.week-table tr:last-child td{border-bottom:none;}
-  table.week-table td.day-name{ color:var(--ink); font-weight:500; text-align:right; }
-
-  .note-box{ margin-top:20px; background:#fbf7ec; border-inset-start: 3px solid var(--gold); border-right:3px solid var(--gold); padding:14px 18px; font-size:0.88rem; color:var(--ink-soft); border-radius:3px; }
-
-  footer{ background:var(--navy-deep); color:#c7d0da; padding:36px 24px; text-align:center; font-size:0.9rem; border-top:3px solid var(--gold); }
-  footer .brand{color:var(--gold-light); font-family:'Amiri',serif; font-size:1.2rem; display:block; margin-bottom:10px;}
-
-  @media (max-width:700px){ .main-nav{display:none;} }
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -89,12 +16,13 @@
   </div>
   <nav class="main-nav">
     <ul>
-      <li><a href="surahs.html">معلومات السور</a></li>
+      <li><a href="index.html">الرئيسية</a></li>
       <li><a href="schedules.html" class="active">جداول الحفظ والمراجعة</a></li>
       <li><a href="mutashabihat.html">متشابهات القرآن</a></li>
-      <li><a href="index.html#asbab">أسباب النزول</a></li>
-      <li><a href="index.html#dalalat">الدلالات اللغوية</a></li>
-      <li><a href="index.html#share">شاركنا تجربتك</a></li>
+      <li><a href="surahs.html">معلومات عن السورة</a></li>
+      <li><a href="asbab-nuzul.html">أسباب النزول</a></li>
+      <li><a href="dalalat.html">الدلالات اللغوية</a></li>
+      <li><a href="memory-boost.html">تحسين الذاكرة</a></li>
     </ul>
   </nav>
 </header>
@@ -110,7 +38,7 @@
     <span class="num">١</span>
     <h2>خطط الحفظ الجديد</h2>
   </div>
-  <p class="section-desc">اختر المدة التي تريد ختم حفظ القرآن الكريم خلالها، وستظهر لك خطة تقريبية بالمقدار اليومي والتوزيع الأسبوعي. الخطط مبنية على حفظ ٦ أيام أسبوعيًا، مع تخصيص يوم للمراجعة العامة والراحة.</p>
+  <p class="section-desc">اختر المدة التي تريد ختم حفظ القرآن الكريم خلالها، وستظهر لك خطة تقريبية بالمقدار اليومي والتوزيع الأسبوعي. الخطط مبنية على حفظ ٥ أيام أسبوعيًا، مع يوم مراجعة مكثفة ويوم راحة.</p>
 
   <div class="tab-row" id="new-tabs">
     <button class="tab-btn" data-panel="p-6m">٦ أشهر</button>
@@ -303,6 +231,11 @@
   </div>
 </section>
 
+<footer>
+  <span class="brand">قوت الحفاظ</span>
+  نسأل الله أن ينفع به كل طالب حفظ لكتابه الكريم
+</footer>
+
 <script>
   function setupTabs(tabRowId){
     const row = document.getElementById(tabRowId);
@@ -312,7 +245,6 @@
         const targetId = btn.getAttribute('data-panel');
         buttons.forEach(b=>b.classList.remove('active'));
         btn.classList.add('active');
-        // hide all panels in this row's group
         buttons.forEach(b=>{
           const p = document.getElementById(b.getAttribute('data-panel'));
           if(p) p.classList.remove('show');
@@ -324,7 +256,6 @@
         }
       });
     });
-    // open first by default
     if(buttons.length){
       buttons[0].click();
     }
@@ -334,8 +265,4 @@
 </script>
 
 </body>
-<footer>
-  <span class="brand">قوت الحفاظ</span>
-  نسأل الله أن ينفع به كل طالب حفظ لكتابه الكريم
-</footer>
 </html>
