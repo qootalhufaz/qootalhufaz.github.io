@@ -27,209 +27,210 @@
   </nav>
 </header>
 
-<div class="page-head">
-  <h1>جداول الحفظ والمراجعة</h1>
-  <p>اختر الخطة التي تناسب وقتك وما تحفظه حاليًا — قسم للحفظ الجديد، وقسم للمراجعة.</p>
+<!-- ============ ١) شاشة الاختيار الأولى ============ -->
+<div id="chooser" style="display:none;">
+  <div class="dash-banner">
+    <div class="inner text-center">
+      <div class="eyebrow">قوت الحفاظ</div>
+      <h1>ماذا تريد أن تفعل اليوم؟ <span class="accent">اختر مسارك</span></h1>
+    </div>
+  </div>
+  <div class="dash-container">
+    <div class="track-choice">
+      <button type="button" class="track-card" onclick="chooseTrack('mem')">
+        <div class="track-icon">📖</div>
+        <div class="track-title">حفظ جديد</div>
+        <div class="track-desc">خطة زمنية لحفظ القرآن الكريم كاملاً، مع مراجعة يومية وأسبوعية لما سبق حفظه.</div>
+      </button>
+      <button type="button" class="track-card" onclick="chooseTrack('review')">
+        <div class="track-icon">🔄</div>
+        <div class="track-title">مراجعة</div>
+        <div class="track-desc">دورة مراجعة منتظمة لما سبق حفظه، حسب كمية المحفوظ.</div>
+      </button>
+    </div>
+  </div>
 </div>
 
-<!-- ============ قسم حفظ جديد ============ -->
-<section id="new-memorization">
-  <div class="section-title">
-    <span class="num">١</span>
-    <h2>خطط الحفظ الجديد</h2>
+<!-- ============ ٢) تسجيل حفظ جديد ============ -->
+<div id="mem-onboarding" style="display:none;">
+  <div class="dash-topbar">
+    <a href="#" class="back-link" onclick="goBackFromOnboarding('mem');return false;">→ رجوع</a>
   </div>
-  <p class="section-desc">اختر المدة التي تريد ختم حفظ القرآن الكريم خلالها، وستظهر لك خطة تقريبية بالمقدار اليومي والتوزيع الأسبوعي. الخطط مبنية على حفظ ٥ أيام أسبوعيًا، مع يوم مراجعة مكثفة ويوم راحة.</p>
-
-  <div class="tab-row" id="new-tabs">
-    <button class="tab-btn" data-panel="p-6m">٦ أشهر</button>
-    <button class="tab-btn" data-panel="p-1y">سنة</button>
-    <button class="tab-btn" data-panel="p-2y">سنتان</button>
-    <button class="tab-btn" data-panel="p-3y">٣ سنوات</button>
-    <button class="tab-btn" data-panel="p-4y">٤ سنوات</button>
-    <button class="tab-btn" data-panel="p-5y">٥ سنوات</button>
-  </div>
-
-  <div class="plan-panel" id="p-6m">
-    <div class="plan-header"><h3>خطة ختم الحفظ في ٦ أشهر</h3><span class="badge">مكثفة</span></div>
-    <div class="stat-row">
-      <div class="stat-box"><div class="val">٤ صفحات</div><div class="lbl">يوميًا تقريبًا</div></div>
-      <div class="stat-box"><div class="val">٢٤ صفحة</div><div class="lbl">أسبوعيًا</div></div>
-      <div class="stat-box"><div class="val">حزب تقريبًا</div><div class="lbl">كل يومين</div></div>
+  <div class="dash-banner">
+    <div class="inner text-center">
+      <div class="eyebrow">حفظ جديد</div>
+      <h1>لنُعِدّ خطة حفظك معًا</h1>
     </div>
-    <table class="week-table">
-      <tr><th>اليوم</th><th>المهمة</th></tr>
-      <tr><td class="day-name">السبت – الخميس</td><td>حفظ جديد: ٤ صفحات، مع مراجعة قريبة لآخر ما تم حفظه (صفحتان)</td></tr>
-      <tr><td class="day-name">الجمعة</td><td>مراجعة عامة أسبوعية لكل ما حُفظ هذا الأسبوع، بدون حفظ جديد</td></tr>
-    </table>
-    <div class="note-box">هذه خطة مكثفة تحتاج تفرغًا شبه كامل، وتناسب من لديه وقت واسع ورغبة في الختم السريع. يفضّل مراجعة يومية إضافية لما سبق حفظه في أوقات متفرقة من اليوم.</div>
   </div>
-
-  <div class="plan-panel" id="p-1y">
-    <div class="plan-header"><h3>خطة ختم الحفظ في سنة</h3><span class="badge">متوسطة</span></div>
-    <div class="stat-row">
-      <div class="stat-box"><div class="val">صفحتان</div><div class="lbl">يوميًا تقريبًا</div></div>
-      <div class="stat-box"><div class="val">١٢ صفحة</div><div class="lbl">أسبوعيًا</div></div>
-      <div class="stat-box"><div class="val">جزء تقريبًا</div><div class="lbl">كل ١٠ أيام</div></div>
+  <div class="dash-container">
+    <div class="onb-card">
+      <div class="field">
+        <label>اسمك (اختياري)</label>
+        <input type="text" id="memName" class="text-input" placeholder="مثال: محمد">
+      </div>
+      <div class="field">
+        <label>اختر الخطة الزمنية المناسبة لك</label>
+        <div class="pill-group" id="memPlanGroup">
+          <button type="button" class="pill" data-val="p6m">٦ أشهر</button>
+          <button type="button" class="pill active" data-val="p1y">سنة</button>
+          <button type="button" class="pill" data-val="p2y">سنتان</button>
+          <button type="button" class="pill" data-val="p3y">٣ سنوات</button>
+          <button type="button" class="pill" data-val="p4y">٤ سنوات</button>
+          <button type="button" class="pill" data-val="p5y">٥ سنوات</button>
+        </div>
+        <div class="hint">يمكنك تغييرها لاحقًا من زر "تعديل" داخل لوحتك.</div>
+      </div>
+      <button class="primary-btn" onclick="saveMemOnboarding()">ابدأ خطتي</button>
     </div>
-    <table class="week-table">
-      <tr><th>اليوم</th><th>المهمة</th></tr>
-      <tr><td class="day-name">السبت – الخميس</td><td>حفظ جديد: صفحتان، مع مراجعة قريبة (صفحة واحدة)</td></tr>
-      <tr><td class="day-name">الجمعة</td><td>مراجعة عامة أسبوعية لكل ما حُفظ هذا الأسبوع</td></tr>
-    </table>
-    <div class="note-box">خطة متوازنة، مناسبة للطالب أو الموظف الذي يستطيع تخصيص وقت ثابت يوميًا للحفظ.</div>
+    <div class="footnote">تُحفظ هذه البيانات على جهازك فقط داخل المتصفح، ولا تُرسل لأي خادم.</div>
   </div>
+</div>
 
-  <div class="plan-panel" id="p-2y">
-    <div class="plan-header"><h3>خطة ختم الحفظ في سنتين</h3><span class="badge">معتدلة</span></div>
-    <div class="stat-row">
-      <div class="stat-box"><div class="val">صفحة واحدة</div><div class="lbl">يوميًا تقريبًا</div></div>
-      <div class="stat-box"><div class="val">٦ صفحات</div><div class="lbl">أسبوعيًا</div></div>
-      <div class="stat-box"><div class="val">جزء تقريبًا</div><div class="lbl">كل ٣ أسابيع</div></div>
+<!-- ============ ٣) لوحة حفظ جديد ============ -->
+<div id="mem-dashboard" style="display:none;">
+  <div id="trackSwitchMem" class="track-switch" style="display:none;">
+    <div class="subsection-tabs">
+      <button type="button" class="active" onclick="switchTrack('mem')">حفظ جديد</button>
+      <button type="button" onclick="switchTrack('review')">مراجعة</button>
     </div>
-    <table class="week-table">
-      <tr><th>اليوم</th><th>المهمة</th></tr>
-      <tr><td class="day-name">السبت – الخميس</td><td>حفظ جديد: صفحة واحدة، مع مراجعة قريبة لنصف صفحة</td></tr>
-      <tr><td class="day-name">الجمعة</td><td>مراجعة عامة أسبوعية</td></tr>
-    </table>
-    <div class="note-box">وتيرة مريحة تناسب أصحاب الأشغال والدراسة، مع إمكانية ترسيخ الحفظ بشكل أعمق لقلة المقدار اليومي.</div>
   </div>
-
-  <div class="plan-panel" id="p-3y">
-    <div class="plan-header"><h3>خطة ختم الحفظ في ٣ سنوات</h3><span class="badge">تدريجية</span></div>
-    <div class="stat-row">
-      <div class="stat-box"><div class="val">٤ صفحات</div><div class="lbl">أسبوعيًا تقريبًا</div></div>
-      <div class="stat-box"><div class="val">نصف صفحة</div><div class="lbl">في معظم الأيام</div></div>
-      <div class="stat-box"><div class="val">جزء تقريبًا</div><div class="lbl">كل شهر</div></div>
+  <div class="dash-banner greet-banner">
+    <div class="inner">
+      <div>
+        <div class="eyebrow" id="memGreetTime">مساء الخير</div>
+        <h1 id="memGreetName">نبدأ بخطوة مباركة</h1>
+      </div>
+      <button class="edit-link" onclick="showMemOnboarding(true)">تعديل</button>
     </div>
-    <table class="week-table">
-      <tr><th>اليوم</th><th>المهمة</th></tr>
-      <tr><td class="day-name">السبت، الاثنين، الأربعاء</td><td>حفظ جديد: صفحة واحدة</td></tr>
-      <tr><td class="day-name">الأحد، الثلاثاء، الخميس</td><td>مراجعة قريبة فقط، بدون حفظ جديد</td></tr>
-      <tr><td class="day-name">الجمعة</td><td>مراجعة عامة أسبوعية</td></tr>
-    </table>
-    <div class="note-box">مناسبة لمن يريد حفظًا متينًا دون ضغط، مع أيام مخصصة للمراجعة فقط لترسيخ ما سبق.</div>
   </div>
 
-  <div class="plan-panel" id="p-4y">
-    <div class="plan-header"><h3>خطة ختم الحفظ في ٤ سنوات</h3><span class="badge">هادئة</span></div>
-    <div class="stat-row">
-      <div class="stat-box"><div class="val">٣ صفحات</div><div class="lbl">أسبوعيًا تقريبًا</div></div>
-      <div class="stat-box"><div class="val">نصف صفحة</div><div class="lbl">يومي الحفظ</div></div>
-      <div class="stat-box"><div class="val">جزء تقريبًا</div><div class="lbl">كل ٥ أسابيع</div></div>
+  <div class="dash-container">
+    <div class="verse-card">
+      <div class="tag">آية اليوم</div>
+      <div class="verse" id="memVerseText"></div>
+      <div class="ref" id="memVerseRef"></div>
     </div>
-    <table class="week-table">
-      <tr><th>اليوم</th><th>المهمة</th></tr>
-      <tr><td class="day-name">السبت، الاثنين، الثلاثاء</td><td>حفظ جديد: نصف صفحة إلى صفحة</td></tr>
-      <tr><td class="day-name">الأحد، الأربعاء، الخميس</td><td>مراجعة قريبة فقط</td></tr>
-      <tr><td class="day-name">الجمعة</td><td>مراجعة عامة أسبوعية</td></tr>
-    </table>
-    <div class="note-box">وتيرة هادئة جدًا تناسب من وقته محدود جدًا، مع تركيز أكبر على إتقان القليل بدل التوسع السريع.</div>
-  </div>
 
-  <div class="plan-panel" id="p-5y">
-    <div class="plan-header"><h3>خطة ختم الحفظ في ٥ سنوات</h3><span class="badge">ميسّرة</span></div>
-    <div class="stat-row">
-      <div class="stat-box"><div class="val">صفحتان</div><div class="lbl">أسبوعيًا تقريبًا</div></div>
-      <div class="stat-box"><div class="val">ربع صفحة</div><div class="lbl">يومي الحفظ</div></div>
-      <div class="stat-box"><div class="val">جزء تقريبًا</div><div class="lbl">كل شهرين</div></div>
+    <div class="dash-label">خطة الحفظ</div>
+    <div class="plan-card">
+      <div class="surah-name" id="memPlanLabel"></div>
+      <div class="sub" id="memPlanSub"></div>
+      <div class="progress-track"><div class="progress-fill" id="memProgressFill"></div></div>
+      <div class="progress-labels">
+        <span id="memProgressText"></span>
+        <span id="memProgressPct"></span>
+      </div>
     </div>
-    <table class="week-table">
-      <tr><th>اليوم</th><th>المهمة</th></tr>
-      <tr><td class="day-name">السبت، الاثنين</td><td>حفظ جديد: صفحة واحدة</td></tr>
-      <tr><td class="day-name">باقي الأيام</td><td>مراجعة قريبة فقط، بدون حفظ جديد</td></tr>
-      <tr><td class="day-name">الجمعة</td><td>مراجعة عامة أسبوعية</td></tr>
-    </table>
-    <div class="note-box">أخف الخطط وأكثرها مرونة، مناسبة جدًا لمن وقته ضيق جدًا أو يبدأ الحفظ لأول مرة ويريد التدرج دون انقطاع.</div>
-  </div>
-</section>
 
-<!-- ============ قسم جداول المراجعة ============ -->
-<section id="review-plans">
-  <div class="section-title">
-    <span class="num">٢</span>
-    <h2>خطط المراجعة</h2>
-  </div>
-  <p class="section-desc">اختر الفئة المناسبة لما تحفظه حاليًا، وستظهر لك خطة مراجعة تحافظ على محفوظك وتقلل النسيان.</p>
 
-  <div class="tab-row" id="review-tabs">
-    <button class="tab-btn" data-panel="r-t1">أقل من ٥ أجزاء</button>
-    <button class="tab-btn" data-panel="r-t2">٥ إلى ١٠ أجزاء</button>
-    <button class="tab-btn" data-panel="r-t3">١٠ إلى ٢٠ جزءًا</button>
-    <button class="tab-btn" data-panel="r-t4">أكثر من ٢٠ جزءًا</button>
-    <button class="tab-btn" data-panel="r-shamla">خطة شاملة عامة</button>
-  </div>
+    <div class="dash-label">مهام اليوم</div>
+    <div class="task-list" id="memTaskList"></div>
 
-  <div class="plan-panel" id="r-t1">
-    <div class="plan-header"><h3>مراجعة لمن يحفظ أقل من ٥ أجزاء</h3><span class="badge">دورة كل ٣-٤ أيام</span></div>
-    <div class="stat-row">
-      <div class="stat-box"><div class="val">جزء إلى جزء ونصف</div><div class="lbl">مراجعة يومية</div></div>
-      <div class="stat-box"><div class="val">٣-٤ أيام</div><div class="lbl">لإكمال دورة على كل المحفوظ</div></div>
+    <div class="streak-row">
+      <div class="streak-box">
+        <div class="num" id="memStreakNum">0</div>
+        <div class="lbl">أيام متتالية</div>
+      </div>
+      <div class="streak-box">
+        <div class="num" id="memPagesDoneNum">0</div>
+        <div class="lbl">من ٦٠٤ صفحة</div>
+      </div>
     </div>
-    <table class="week-table">
-      <tr><th>اليوم</th><th>المهمة</th></tr>
-      <tr><td class="day-name">يوميًا</td><td>مراجعة جزء إلى جزء ونصف من المحفوظ بالترتيب، حتى تكتمل دورة على الكل ثم تبدأ من جديد</td></tr>
-      <tr><td class="day-name">الجمعة</td><td>مراجعة عشوائية سريعة (فتح المصحف من مواضع متفرقة) لاختبار الثبات</td></tr>
-    </table>
-    <div class="note-box">في هذه المرحلة المبكرة، كثرة المراجعة أهم من كثرة الحفظ الجديد لضمان عدم تسرب المحفوظ.</div>
+
+    <div class="cta-box" id="memAddTrackLink"></div>
+  </div>
+</div>
+
+<!-- ============ ٤) تسجيل مراجعة ============ -->
+<div id="rev-onboarding" style="display:none;">
+  <div class="dash-topbar">
+    <a href="#" class="back-link" onclick="goBackFromOnboarding('review');return false;">→ رجوع</a>
+  </div>
+  <div class="dash-banner">
+    <div class="inner text-center">
+      <div class="eyebrow">مراجعة</div>
+      <h1>لنُعِدّ خطة مراجعتك معًا</h1>
+    </div>
+  </div>
+  <div class="dash-container">
+    <div class="onb-card">
+      <div class="field">
+        <label>اسمك (اختياري)</label>
+        <input type="text" id="revName" class="text-input" placeholder="مثال: محمد">
+      </div>
+      <div class="field">
+        <label>كم جزءًا تحفظ تقريبًا؟</label>
+        <div class="stepper">
+          <button type="button" onclick="changeRevJuz(1)">+</button>
+          <div class="val" id="revJuzVal">5</div>
+          <button type="button" onclick="changeRevJuz(-1)">−</button>
+        </div>
+        <div class="hint">يساعدنا هذا في حساب الجزء المحدد لمراجعتك كل يوم بدقة</div>
+      </div>
+      <div class="field">
+        <label>اختر فئة المراجعة المناسبة</label>
+        <div class="pill-group" id="revCatGroup">
+          <button type="button" class="pill active" data-val="t1">أقل من ٥ أجزاء</button>
+          <button type="button" class="pill" data-val="t2">٥ إلى ١٠ أجزاء</button>
+          <button type="button" class="pill" data-val="t3">١٠ إلى ٢٠ جزءًا</button>
+          <button type="button" class="pill" data-val="t4">أكثر من ٢٠ جزءًا</button>
+          <button type="button" class="pill" data-val="shamla">خطة شاملة عامة</button>
+        </div>
+      </div>
+      <button class="primary-btn" onclick="saveRevOnboarding()">ابدأ متابعتي</button>
+    </div>
+    <div class="footnote">تُحفظ هذه البيانات على جهازك فقط داخل المتصفح، ولا تُرسل لأي خادم.</div>
+  </div>
+</div>
+
+<!-- ============ ٥) لوحة المراجعة ============ -->
+<div id="rev-dashboard" style="display:none;">
+  <div id="trackSwitchRev" class="track-switch" style="display:none;">
+    <div class="subsection-tabs">
+      <button type="button" onclick="switchTrack('mem')">حفظ جديد</button>
+      <button type="button" class="active" onclick="switchTrack('review')">مراجعة</button>
+    </div>
+  </div>
+  <div class="dash-banner greet-banner">
+    <div class="inner">
+      <div>
+        <div class="eyebrow" id="revGreetTime">مساء الخير</div>
+        <h1 id="revGreetName">نبدأ بخطوة مباركة</h1>
+      </div>
+      <button class="edit-link" onclick="showRevOnboarding(true)">تعديل</button>
+    </div>
   </div>
 
-  <div class="plan-panel" id="r-t2">
-    <div class="plan-header"><h3>مراجعة لمن يحفظ ٥ إلى ١٠ أجزاء</h3><span class="badge">دورة كل ٥ أيام</span></div>
-    <div class="stat-row">
-      <div class="stat-box"><div class="val">جزءان</div><div class="lbl">مراجعة يومية</div></div>
-      <div class="stat-box"><div class="val">٥ أيام</div><div class="lbl">لإكمال دورة على كل المحفوظ</div></div>
+  <div class="dash-container">
+    <div class="verse-card">
+      <div class="tag">آية اليوم</div>
+      <div class="verse" id="revVerseText"></div>
+      <div class="ref" id="revVerseRef"></div>
     </div>
-    <table class="week-table">
-      <tr><th>اليوم</th><th>المهمة</th></tr>
-      <tr><td class="day-name">يوميًا</td><td>مراجعة جزأين بالترتيب حتى تكتمل دورة كاملة على المحفوظ</td></tr>
-      <tr><td class="day-name">الجمعة</td><td>مراجعة الأجزاء التي تشعر بضعف فيها خصوصًا</td></tr>
-    </table>
-    <div class="note-box">ابدأ بربط الأجزاء ببعضها بالتسميع المتواصل، لا كل جزء منفردًا فقط.</div>
-  </div>
 
-  <div class="plan-panel" id="r-t3">
-    <div class="plan-header"><h3>مراجعة لمن يحفظ ١٠ إلى ٢٠ جزءًا</h3><span class="badge">دورة أسبوعية</span></div>
-    <div class="stat-row">
-      <div class="stat-box"><div class="val">٣ أجزاء</div><div class="lbl">مراجعة يومية</div></div>
-      <div class="stat-box"><div class="val">أسبوع تقريبًا</div><div class="lbl">لإكمال دورة على كل المحفوظ</div></div>
+    <div class="dash-label">فئة المراجعة</div>
+    <div class="plan-card">
+      <div class="surah-name" id="revPlanLabel"></div>
+      <div class="sub" id="revPlanSub"></div>
     </div>
-    <table class="week-table">
-      <tr><th>اليوم</th><th>المهمة</th></tr>
-      <tr><td class="day-name">يوميًا</td><td>مراجعة ٣ أجزاء بالترتيب حتى تكتمل دورة على المحفوظ كاملاً</td></tr>
-      <tr><td class="day-name">الجمعة</td><td>تسميع لأحد أفراد الأسرة أو زميل، للتأكد من الإتقان لا الحفظ فقط</td></tr>
-    </table>
-    <div class="note-box">في هذه المرحلة يُنصح بالانتباه للمتشابهات بين الأجزاء المختلفة، فهي أكثر ما يُنسى.</div>
-  </div>
 
-  <div class="plan-panel" id="r-t4">
-    <div class="plan-header"><h3>مراجعة لمن يحفظ أكثر من ٢٠ جزءًا</h3><span class="badge">دورة أسبوعية</span></div>
-    <div class="stat-row">
-      <div class="stat-box"><div class="val">٤-٥ أجزاء</div><div class="lbl">مراجعة يومية</div></div>
-      <div class="stat-box"><div class="val">أسبوع تقريبًا</div><div class="lbl">لإكمال دورة على كل القرآن</div></div>
-    </div>
-    <table class="week-table">
-      <tr><th>اليوم</th><th>المهمة</th></tr>
-      <tr><td class="day-name">يوميًا</td><td>مراجعة ٤ إلى ٥ أجزاء بالترتيب، مع التركيز على متشابهات الآيات</td></tr>
-      <tr><td class="day-name">الجمعة</td><td>مراجعة تراكمية شاملة لأضعف المواضع التي تسجلها خلال الأسبوع</td></tr>
-    </table>
-    <div class="note-box">في هذه المرحلة، حافظ على دورة ثابتة أسبوعية على كل القرآن، ولا تدع أي جزء يمر عليه أكثر من أسبوعين دون مراجعة.</div>
-  </div>
+    <div class="dash-label">مهام اليوم</div>
+    <div class="task-list" id="revTaskList"></div>
 
-  <div class="plan-panel" id="r-shamla">
-    <div class="plan-header"><h3>الخطة الشاملة العامة</h3><span class="badge">لكل المستويات</span></div>
-    <div class="stat-row">
-      <div class="stat-box"><div class="val">وجه إلى صفحة</div><div class="lbl">مراجعة يومية ثابتة كحد أدنى</div></div>
-      <div class="stat-box"><div class="val">دورة كاملة</div><div class="lbl">على كامل القرآن دوريًا</div></div>
+    <div class="streak-row">
+      <div class="streak-box">
+        <div class="num" id="revStreakNum">0</div>
+        <div class="lbl">أيام متتالية</div>
+      </div>
+      <div class="streak-box">
+        <div class="num" id="revJuzTotalNum">0</div>
+        <div class="lbl">أجزاء محفوظة</div>
+      </div>
     </div>
-    <table class="week-table">
-      <tr><th>اليوم</th><th>المهمة</th></tr>
-      <tr><td class="day-name">يوميًا</td><td>لا تقل المراجعة اليومية عن وجه واحد مهما كانت مشاغلك</td></tr>
-      <tr><td class="day-name">أسبوعيًا</td><td>خصص يومًا (الجمعة مثلاً) لتقييم نفسك: ما الذي ضعف؟ وأعد جدولة مراجعته</td></tr>
-      <tr><td class="day-name">شهريًا</td><td>حاول ختم مراجعة كاملة لما تحفظه، وسجّل أضعف المواضع</td></tr>
-    </table>
-    <div class="note-box">هذه خطة إرشادية عامة يصلح الرجوع إليها في أي مرحلة، وتُبنى عليها بقية الخطط أعلاه حسب مقدار المحفوظ.</div>
+
+    <div class="cta-box" id="revAddTrackLink"></div>
   </div>
-</section>
+</div>
 
 <footer>
   <span class="brand">قوت الحفاظ</span>
@@ -237,32 +238,456 @@
 </footer>
 
 <script>
-  function setupTabs(tabRowId){
-    const row = document.getElementById(tabRowId);
-    const buttons = row.querySelectorAll('.tab-btn');
-    buttons.forEach(btn=>{
-      btn.addEventListener('click', ()=>{
-        const targetId = btn.getAttribute('data-panel');
-        buttons.forEach(b=>b.classList.remove('active'));
-        btn.classList.add('active');
-        buttons.forEach(b=>{
-          const p = document.getElementById(b.getAttribute('data-panel'));
-          if(p) p.classList.remove('show');
-        });
-        const target = document.getElementById(targetId);
-        if(target){
-          target.classList.add('show');
-          target.scrollIntoView({behavior:'smooth', block:'nearest'});
-        }
-      });
-    });
-    if(buttons.length){
-      buttons[0].click();
-    }
+/* =====================================================================
+   ثوابت عامة
+   ===================================================================== */
+const PAGE_TOTAL = 604;
+const MEM_KEY = "qootAlhufazMemPlan";
+const REV_KEY = "qootAlhufazReviewPlan";
+const LAST_KEY = "qootAlhufazLastTrack";
+
+const VERSES = [
+  {text:"وَلَقَدْ يَسَّرْنَا الْقُرْآنَ لِلذِّكْرِ فَهَلْ مِن مُّدَّكِرٍ", ref:"القمر: 17"},
+  {text:"وَقُل رَّبِّ زِدْنِي عِلْمًا", ref:"طه: 114"},
+  {text:"إِنَّ هَٰذَا الْقُرْآنَ يَهْدِي لِلَّتِي هِيَ أَقْوَمُ", ref:"الإسراء: 9"},
+  {text:"وَرَتِّلِ الْقُرْآنَ تَرْتِيلًا", ref:"المزمل: 4"},
+  {text:"فَإِذَا قَرَأْنَاهُ فَاتَّبِعْ قُرْآنَهُ", ref:"القيامة: 18"},
+  {text:"الَّذِينَ آتَيْنَاهُمُ الْكِتَابَ يَتْلُونَهُ حَقَّ تِلَاوَتِهِ أُولَٰئِكَ يُؤْمِنُونَ بِهِ", ref:"البقرة: 121"}
+];
+
+// فئات المراجعة: عدد أيام دورة المراجعة الكاملة (null = خطة شاملة بدون تقسيم أجزاء)
+// (لا تزال مؤقتة تقريبية بانتظار الأرقام الحقيقية لمسار "مراجعة" — القسم ٧ بملف السياق)
+const REVIEW_CATS = {
+  t1:     {label:"أقل من ٥ أجزاء",   cycleDays:3},
+  t2:     {label:"٥ إلى ١٠ أجزاء",   cycleDays:5},
+  t3:     {label:"١٠ إلى ٢٠ جزءًا",  cycleDays:7},
+  t4:     {label:"أكثر من ٢٠ جزءًا", cycleDays:7},
+  shamla: {label:"خطة شاملة عامة",   cycleDays:null}
+};
+
+let memState = null;
+let revState = null;
+let lastTrack = 'mem';
+let selectedRevJuz = 5;
+let MEM_PLAN_DATA = null;
+
+/* =====================================================================
+   أدوات مساعدة عامة
+   ===================================================================== */
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+function diffDays(a, b){ return Math.round((new Date(b) - new Date(a)) / 86400000); }
+function loadJSON(key){
+  try{ const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : null; }
+  catch(e){ return null; }
+}
+function saveJSON(key, obj){ localStorage.setItem(key, JSON.stringify(obj)); }
+
+function greetingTime(){
+  const h = new Date().getHours();
+  return h < 12 ? "صباح الخير" : "مساء الخير";
+}
+function dayIndexOfYear(){
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 0);
+  return Math.floor((now - start) / 86400000);
+}
+function todayVerse(){ return VERSES[dayIndexOfYear() % VERSES.length]; }
+
+function updateStreak(state){
+  const today = todayStr();
+  if(state.lastStreakDate === today) return;
+  if(state.lastStreakDate){
+    const diff = diffDays(state.lastStreakDate, today);
+    state.streak = diff === 1 ? state.streak + 1 : 1;
+  } else {
+    state.streak = 1;
   }
-  setupTabs('new-tabs');
-  setupTabs('review-tabs');
+  state.lastStreakDate = today;
+}
+
+function ensureFreshTaskDay(state){
+  if(!state.taskStatus || state.taskStatus.date !== todayStr()){
+    state.taskStatus = {date: todayStr(), items:{}};
+  }
+}
+
+/* =====================================================================
+   إدارة عرض الشاشات
+   ===================================================================== */
+function showView(id){
+  ['chooser','mem-onboarding','mem-dashboard','rev-onboarding','rev-dashboard'].forEach(v=>{
+    document.getElementById(v).style.display = (v === id) ? 'block' : 'none';
+  });
+}
+
+function chooseTrack(track){
+  if(track === 'mem'){
+    if(memState) showMemDashboard(); else showMemOnboarding(false);
+  } else {
+    if(revState) showRevDashboard(); else showRevOnboarding(false);
+  }
+}
+
+function switchTrack(track){
+  lastTrack = track;
+  saveJSON(LAST_KEY, lastTrack);
+  if(track === 'mem') showMemDashboard(); else showRevDashboard();
+}
+
+// الرجوع من شاشة التسجيل: يرجع للوحة المحفوظة لهذا المسار إن وُجدت (إلغاء التعديل)،
+// وإلا يرجع للوحة المسار الآخر إن وُجدت، وإلا يرجع لشاشة الاختيار الأولى
+function goBackFromOnboarding(track){
+  if(track === 'mem'){
+    if(memState) showMemDashboard();
+    else if(revState) showRevDashboard();
+    else showView('chooser');
+  } else {
+    if(revState) showRevDashboard();
+    else if(memState) showMemDashboard();
+    else showView('chooser');
+  }
+}
+
+// تبديل اختيار "pill" (زر دائري) ضمن أي مجموعة pill-group
+document.addEventListener('click', function(e){
+  const pill = e.target.closest('.pill');
+  if(pill && pill.parentElement.classList.contains('pill-group')){
+    pill.parentElement.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
+    pill.classList.add('active');
+  }
+});
+
+/* =====================================================================
+   مسار: حفظ جديد
+   ===================================================================== */
+function showMemOnboarding(prefill){
+  if(prefill && memState){
+    document.getElementById('memName').value = memState.name || "";
+    document.querySelectorAll('#memPlanGroup .pill').forEach(p=>{
+      p.classList.toggle('active', p.dataset.val === memState.planId);
+    });
+  }
+  showView('mem-onboarding');
+}
+
+function saveMemOnboarding(){
+  const name = document.getElementById('memName').value.trim();
+  const activePill = document.querySelector('#memPlanGroup .pill.active');
+  const planId = activePill ? activePill.dataset.val : 'p1y';
+  const existing = memState || {};
+  memState = {
+    name: name || existing.name || "",
+    planId: planId,
+    startDate: existing.startDate || todayStr(),
+    streak: existing.streak || 0,
+    lastStreakDate: existing.lastStreakDate || null,
+    taskStatus: (existing.taskStatus && existing.taskStatus.date === todayStr()) ? existing.taskStatus : {date: todayStr(), items:{}}
+  };
+  saveJSON(MEM_KEY, memState);
+  lastTrack = 'mem';
+  saveJSON(LAST_KEY, lastTrack);
+  showMemDashboard();
+}
+
+// عدد الأيام غير الجمعة (أيام الجدول الفعلية) بين تاريخين، النهاية غير شاملة
+function countNonFridayDays(start, endExclusive){
+  let count = 0;
+  const cursor = new Date(start);
+  while(cursor < endExclusive){
+    if(cursor.getDay() !== 5) count++;
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  return count;
+}
+
+// أكبر صفحة "حفظ جديد" وصل إليها الزائر حتى نهاية اليوم رقم uptoIndex (١-index)، أو ٠ إن لم يبدأ بعد
+function pagesMemorizedThrough(days, uptoIndex){
+  for(let i = Math.min(uptoIndex, days.length) - 1; i >= 0; i--){
+    if(days[i].new) return days[i].new[1];
+  }
+  return 0;
+}
+
+function computeMemToday(state){
+  const planData = MEM_PLAN_DATA[state.planId];
+  const start = new Date(state.startDate);
+  const today = new Date(todayStr());
+  const todayDow = today.getDay();
+  const isFriday = todayDow === 5;
+  const totalDays = planData.days.length;
+  const elapsedBeforeToday = countNonFridayDays(start, today);
+  const completed = elapsedBeforeToday >= totalDays;
+  const dayIndex = elapsedBeforeToday + 1;
+  const dayEntry = (!isFriday && !completed && dayIndex <= totalDays) ? planData.days[dayIndex - 1] : null;
+  const weekNumber = Math.min(planData.weeks.length, Math.max(1, Math.ceil(elapsedBeforeToday / 6) || 1));
+  const weekEntry = planData.weeks[weekNumber - 1] || null;
+  const pagesDone = pagesMemorizedThrough(planData.days, elapsedBeforeToday);
+  return {planData, isFriday, completed, dayEntry, weekEntry, pagesDone};
+}
+
+function buildMemTasks(info){
+  if(info.completed){
+    return [{id:'done', title:'أتممت الختمة 🎉', desc:'نسأل الله أن يتقبل منك هذا الجهد المبارك'}];
+  }
+  if(info.isFriday){
+    const wr = info.weekEntry ? info.weekEntry.weeklyReview : null;
+    const desc = wr ? `راجع من صفحة ${wr[0]} إلى صفحة ${wr[1]}` : 'راجع كل ما حفظته هذا الأسبوع بالكامل';
+    return [{id:'weekly', title:'مراجعة أسبوعية', desc}];
+  }
+  const d = info.dayEntry;
+  const tasks = [];
+  if(d && d.new){
+    tasks.push({id:'new', title:'حفظ جديد', desc:`من صفحة ${d.new[0]} إلى صفحة ${d.new[1]}`});
+  }
+  if(d && d.near){
+    tasks.push({id:'near', title:'مراجعة قريبة', desc:`من صفحة ${d.near[0]} إلى صفحة ${d.near[1]}`});
+  }
+  if(d && d.cum){
+    tasks.push({id:'cum', title:'مراجعة تراكمية', desc:`من صفحة ${d.cum[0]} إلى صفحة ${d.cum[1]}`});
+  }
+  if(tasks.length === 0){
+    tasks.push({id:'rest', title:'يوم مراجعة', desc:'لا يوجد حفظ جديد اليوم، تابع مراجعتك المعتادة كما تحب'});
+  }
+  return tasks;
+}
+
+function showMemDashboard(){
+  showView('mem-dashboard');
+  const switchBar = document.getElementById('trackSwitchMem');
+  switchBar.style.display = revState ? 'block' : 'none';
+  renderMemDashboard();
+}
+
+function renderMemDashboard(){
+  ensureFreshTaskDay(memState);
+  saveJSON(MEM_KEY, memState);
+
+  document.getElementById('memGreetTime').textContent = greetingTime();
+  document.getElementById('memGreetName').textContent = memState.name
+    ? `السلام عليكم يا ${memState.name}` : "نبدأ بخطوة مباركة";
+
+  const v = todayVerse();
+  document.getElementById('memVerseText').textContent = `«${v.text}»`;
+  document.getElementById('memVerseRef').textContent = v.ref;
+
+  const info = computeMemToday(memState);
+  const plan = info.planData;
+  document.getElementById('memPlanLabel').textContent = `خطة ${plan.label}`;
+  document.getElementById('memPlanSub').textContent = info.completed
+    ? "أتممت حفظ القرآن كاملاً، بارك الله فيك"
+    : `تبدأ من ${memState.startDate} — ${plan.pagesPerDay} صفحة في كل يوم حفظ`;
+
+  const pct = Math.min(100, Math.round((info.pagesDone / PAGE_TOTAL) * 100));
+  document.getElementById('memProgressFill').style.width = pct + '%';
+  document.getElementById('memProgressText').textContent = `${info.pagesDone} من ${PAGE_TOTAL} صفحة`;
+  document.getElementById('memProgressPct').textContent = pct + '%';
+  document.getElementById('memPagesDoneNum').textContent = info.pagesDone;
+  document.getElementById('memStreakNum').textContent = memState.streak;
+
+  renderMemTasks(info);
+
+  const ctaEl = document.getElementById('memAddTrackLink');
+  ctaEl.innerHTML = revState ? '' :
+    '<p>هل ترغب أيضًا بمتابعة مراجعة منتظمة لِما سبق حفظه؟</p>' +
+    '<button type="button" class="btn btn-secondary" onclick="chooseTrack(\'review\')">الانتقال إلى جداول المراجعة</button>';
+}
+
+function renderMemTasks(info){
+  const tasks = buildMemTasks(info);
+  const status = memState.taskStatus.items;
+  document.getElementById('memTaskList').innerHTML = tasks.map(t=>{
+    const checked = !!status[t.id];
+    return `<div class="task ${checked?'checked':''}" onclick="toggleMemTask('${t.id}')">
+      <div class="check">${checked?'✓':''}</div>
+      <div class="body">
+        <div class="title">${t.title}</div>
+        <div class="desc">${t.desc}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleMemTask(id){
+  const items = memState.taskStatus.items;
+  const hadAnyChecked = Object.values(items).some(v=>v);
+  items[id] = !items[id];
+  const hasAnyCheckedNow = Object.values(items).some(v=>v);
+  if(!hadAnyChecked && hasAnyCheckedNow){
+    updateStreak(memState);
+  }
+  saveJSON(MEM_KEY, memState);
+  renderMemDashboard();
+}
+
+/* =====================================================================
+   مسار: مراجعة
+   ===================================================================== */
+function changeRevJuz(delta){
+  selectedRevJuz = Math.min(30, Math.max(1, selectedRevJuz + delta));
+  document.getElementById('revJuzVal').textContent = selectedRevJuz;
+}
+
+function showRevOnboarding(prefill){
+  if(prefill && revState){
+    document.getElementById('revName').value = revState.name || "";
+    selectedRevJuz = revState.juzTotal;
+    document.getElementById('revJuzVal').textContent = selectedRevJuz;
+    document.querySelectorAll('#revCatGroup .pill').forEach(p=>{
+      p.classList.toggle('active', p.dataset.val === revState.categoryId);
+    });
+  }
+  showView('rev-onboarding');
+}
+
+function saveRevOnboarding(){
+  const name = document.getElementById('revName').value.trim();
+  const activePill = document.querySelector('#revCatGroup .pill.active');
+  const categoryId = activePill ? activePill.dataset.val : 't1';
+  const existing = revState || {};
+  revState = {
+    name: name || existing.name || "",
+    categoryId: categoryId,
+    juzTotal: selectedRevJuz,
+    startDate: existing.startDate || todayStr(),
+    streak: existing.streak || 0,
+    lastStreakDate: existing.lastStreakDate || null,
+    taskStatus: (existing.taskStatus && existing.taskStatus.date === todayStr()) ? existing.taskStatus : {date: todayStr(), items:{}}
+  };
+  saveJSON(REV_KEY, revState);
+  lastTrack = 'review';
+  saveJSON(LAST_KEY, lastTrack);
+  showRevDashboard();
+}
+
+function computeRevToday(state){
+  const todayDow = new Date(todayStr()).getDay();
+  const isFriday = todayDow === 5;
+  const cat = REVIEW_CATS[state.categoryId];
+  if(cat.cycleDays){
+    const daysSince = diffDays(state.startDate, todayStr());
+    const dayInCycle = ((daysSince % cat.cycleDays) + cat.cycleDays) % cat.cycleDays;
+    const juzPerDay = state.juzTotal / cat.cycleDays;
+    const fromJuz = Math.max(1, Math.round(dayInCycle * juzPerDay) + 1);
+    const toJuz = Math.max(fromJuz, Math.min(state.juzTotal, Math.round((dayInCycle + 1) * juzPerDay)));
+    return {cat, isFriday, fromJuz, toJuz};
+  }
+  return {cat, isFriday};
+}
+
+function buildRevTasks(info, state){
+  if(info.isFriday){
+    const desc = state.categoryId === 'shamla'
+      ? 'قيّم نفسك: ما الذي ضعف هذا الأسبوع؟ وأعد جدولة مراجعته'
+      : 'مراجعة عشوائية (فتح المصحف من مواضع متفرقة) أو تسميع لأحد لاختبار ثبات محفوظك';
+    return [{id:'friday', title:'مراجعة الجمعة الخاصة', desc}];
+  }
+  if(info.cat.cycleDays){
+    return [{id:'cycle', title:'مراجعة اليوم', desc:`من الجزء ${info.fromJuz} إلى الجزء ${info.toJuz}`}];
+  }
+  return [{id:'daily', title:'مراجعة يومية', desc:'لا تقل عن وجه واحد من محفوظك مهما كانت مشاغلك'}];
+}
+
+function showRevDashboard(){
+  showView('rev-dashboard');
+  const switchBar = document.getElementById('trackSwitchRev');
+  switchBar.style.display = memState ? 'block' : 'none';
+  renderRevDashboard();
+}
+
+function renderRevDashboard(){
+  ensureFreshTaskDay(revState);
+  saveJSON(REV_KEY, revState);
+
+  document.getElementById('revGreetTime').textContent = greetingTime();
+  document.getElementById('revGreetName').textContent = revState.name
+    ? `السلام عليكم يا ${revState.name}` : "نبدأ بخطوة مباركة";
+
+  const v = todayVerse();
+  document.getElementById('revVerseText').textContent = `«${v.text}»`;
+  document.getElementById('revVerseRef').textContent = v.ref;
+
+  const cat = REVIEW_CATS[revState.categoryId];
+  document.getElementById('revPlanLabel').textContent = cat.label;
+  document.getElementById('revPlanSub').textContent = cat.cycleDays
+    ? `دورة مراجعة كاملة كل ${cat.cycleDays} أيام على ${revState.juzTotal} جزء`
+    : `مراجعة يومية عامة تناسب كل مستويات الحفظ`;
+
+  document.getElementById('revJuzTotalNum').textContent = revState.juzTotal;
+  document.getElementById('revStreakNum').textContent = revState.streak;
+
+  const info = computeRevToday(revState);
+  renderRevTasks(info);
+
+  const ctaEl = document.getElementById('revAddTrackLink');
+  ctaEl.innerHTML = memState ? '' :
+    '<p>هل ترغب أيضًا ببدء خطة حفظ جديد؟</p>' +
+    '<button type="button" class="btn btn-secondary" onclick="chooseTrack(\'mem\')">الانتقال إلى خطط الحفظ الجديد</button>';
+}
+
+function renderRevTasks(info){
+  const tasks = buildRevTasks(info, revState);
+  const status = revState.taskStatus.items;
+  document.getElementById('revTaskList').innerHTML = tasks.map(t=>{
+    const checked = !!status[t.id];
+    return `<div class="task ${checked?'checked':''}" onclick="toggleRevTask('${t.id}')">
+      <div class="check">${checked?'✓':''}</div>
+      <div class="body">
+        <div class="title">${t.title}</div>
+        <div class="desc">${t.desc}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleRevTask(id){
+  const items = revState.taskStatus.items;
+  const hadAnyChecked = Object.values(items).some(v=>v);
+  items[id] = !items[id];
+  const hasAnyCheckedNow = Object.values(items).some(v=>v);
+  if(!hadAnyChecked && hasAnyCheckedNow){
+    updateStreak(revState);
+  }
+  saveJSON(REV_KEY, revState);
+  renderRevDashboard();
+}
+
+/* =====================================================================
+   البداية
+   ===================================================================== */
+function startApp(){
+  memState = loadJSON(MEM_KEY);
+  revState = loadJSON(REV_KEY);
+  lastTrack = loadJSON(LAST_KEY) || 'mem';
+
+  if(!memState && !revState){
+    showView('chooser');
+    return;
+  }
+  if(memState && revState){
+    if(lastTrack === 'review') showRevDashboard(); else showMemDashboard();
+  } else if(memState){
+    showMemDashboard();
+  } else {
+    showRevDashboard();
+  }
+}
+
+function init(){
+  fetch('memorization_plans.json')
+    .then(res => { if(!res.ok) throw new Error('fetch failed'); return res.json(); })
+    .then(data => {
+      MEM_PLAN_DATA = data;
+      startApp();
+    })
+    .catch(() => {
+      document.body.innerHTML = '<div class="page-head"><h1>تعذّر تحميل بيانات خطط الحفظ</h1>' +
+        '<p>تأكّد أن ملف memorization_plans.json موجود بنفس مجلد هذه الصفحة، وأنك تفتح الصفحة عبر خادم محلي (Live Server) وليس بالضغط المباشر على الملف.</p></div>';
+    });
+}
+init();
 </script>
+
+<a href="share-experience.html" class="share-fab" title="شاركنا تجربتك">💬</a>
 
 </body>
 </html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>شاركنا تجربتك | قوت الحفاظ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div class="top-bar">
+    <div class="brand">قوت الحفاظ<small>كل ما يحتاجه طالب حفظ القرآن الكريم</small></div>
+  </div>
+  <nav class="main-nav">
+    <ul>
+      <li><a href="index.html">الرئيسية</a></li>
+      <li><a href="schedules.html">جداول الحفظ والمراجعة</a></li>
+      <li><a href="mutashabihat.html">متشابهات القرآن</a></li>
+      <li><a href="surahs.html">معلومات عن السورة</a></li>
+      <li><a href="asbab-nuzul.html">أسباب النزول</a></li>
+      <li><a href="dalalat.html">الدلالات اللغوية</a></li>
+      <li><a href="memory-boost.html">تحسين الذاكرة</a></li>
+    </ul>
+  </nav>
+</header>
+
+<div class="page-head">
+  <h1>شاركنا تجربتك</h1>
+  <p>ملاحظتك أو اقتراحك يصلنا مباشرة، ويساعدنا نطوّر الموقع بما ينفع طالب الحفظ أكثر.</p>
+</div>
+
+<div class="dash-container">
+
+  <form id="shareForm" class="onb-card" action="https://formspree.io/f/moeqqzzq" method="POST">
+    <div class="field">
+      <label for="shareName">الاسم (اختياري)</label>
+      <input type="text" id="shareName" name="name" class="text-input" placeholder="مثال: أم عبدالله">
+    </div>
+
+    <div class="field">
+      <label for="shareType">نوع التجربة</label>
+      <select id="shareType" name="نوع التجربة" class="text-input">
+        <option value="اقتراح">اقتراح</option>
+        <option value="ملاحظة">ملاحظة</option>
+        <option value="شكر وتشجيع">شكر وتشجيع</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="shareMessage">التفاصيل</label>
+      <textarea id="shareMessage" name="التفاصيل" class="text-input" rows="6" required placeholder="اكتب تجربتك هنا..."></textarea>
+    </div>
+
+    <button type="submit" class="primary-btn">إرسال</button>
+    <p id="shareError" class="error-msg" style="display:none;">تعذّر الإرسال، تأكد من اتصالك بالإنترنت وحاول مرة أخرى.</p>
+    <p class="footnote">لن نستخدم بياناتك إلا للتواصل معك إن احتجت الرد على ملاحظتك.</p>
+  </form>
+
+  <div id="shareThanks" class="onb-card text-center" style="display:none;">
+    <div class="track-icon">🌿</div>
+    <h3 style="font-family:'Amiri',serif; color:var(--navy-deep); margin-bottom:10px;">جزاك الله خيرًا</h3>
+    <p style="color:var(--ink-soft); margin-bottom:22px;">وصلتنا تجربتك، نسأل الله أن ينفعك وينفع بك.</p>
+    <a href="index.html" class="btn btn-primary">رجوع للرئيسية</a>
+  </div>
+
+</div>
+
+<footer>
+  <span class="brand">قوت الحفاظ</span>
+  نسأل الله أن ينفع به كل طالب حفظ لكتابه الكريم
+</footer>
+
+<a href="share-experience.html" class="share-fab" title="شاركنا تجربتك">💬</a>
+
+<script>
+const shareForm = document.getElementById('shareForm');
+shareForm.addEventListener('submit', function(e){
+  e.preventDefault();
+  const btn = shareForm.querySelector('.primary-btn');
+  const errorMsg = document.getElementById('shareError');
+  errorMsg.style.display = 'none';
+  btn.disabled = true;
+  btn.textContent = 'جارٍ الإرسال...';
+
+  fetch(shareForm.action, {
+    method: 'POST',
+    body: new FormData(shareForm),
+    headers: { 'Accept': 'application/json' }
+  }).then(function(res){
+    if(res.ok){
+      shareForm.style.display = 'none';
+      document.getElementById('shareThanks').style.display = 'block';
+    } else {
+      throw new Error('فشل الإرسال');
+    }
+  }).catch(function(){
+    btn.disabled = false;
+    btn.textContent = 'إرسال';
+    errorMsg.style.display = 'block';
+  });
+});
+</script>
+
+</body>
+</html>
