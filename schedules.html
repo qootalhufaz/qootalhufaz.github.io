@@ -27,6 +27,20 @@
   </nav>
 </header>
 
+<!-- ============ ٠) تحميل / خطأ ============ -->
+<div id="loading-view" style="display:none;">
+  <div class="dash-container">
+    <div class="loading-state">جارٍ تحميل خطط الحفظ...</div>
+  </div>
+</div>
+<div id="load-error-view" style="display:none;">
+  <div class="dash-container">
+    <div class="plan-load-error">
+      تعذّر تحميل بيانات خطط الحفظ (memorization_plans.json). إن كنت تفتح الملف مباشرة على جهازك، تأكد من تشغيله عبر Live Server أو أي خادم محلي، لأن المتصفح لا يسمح بجلب ملفات JSON من نظام الملفات مباشرة.
+    </div>
+  </div>
+</div>
+
 <!-- ============ ١) شاشة الاختيار الأولى ============ -->
 <div id="chooser" style="display:none;">
   <div class="dash-banner">
@@ -122,8 +136,21 @@
       </div>
     </div>
 
+    <div class="dash-label">استعرض خطتك يومًا بيوم</div>
+    <div class="week-nav">
+      <button type="button" class="week-nav-btn" id="weekPrevBtn" onclick="navWeek(-1)">▶</button>
+      <div class="week-nav-label" id="weekNavLabel"></div>
+      <button type="button" class="week-nav-btn" id="weekNextBtn" onclick="navWeek(1)">◀</button>
+    </div>
+    <div class="week-jump" style="justify-content:center; margin-bottom:16px;">
+      <span class="hint" style="margin:0;">اذهب للأسبوع رقم</span>
+      <input type="text" inputmode="numeric" id="weekJumpInput" placeholder="١">
+      <button type="button" onclick="jumpToWeek()">اذهب</button>
+    </div>
+    <div class="day-strip" id="daysStrip"></div>
 
-    <div class="dash-label">مهام اليوم</div>
+    <div id="previewBar"></div>
+    <div class="day-detail-title" id="dayDetailTitle"></div>
     <div class="task-list" id="memTaskList"></div>
 
     <div class="streak-row">
@@ -162,7 +189,7 @@
         <label>كم جزءًا تحفظ تقريبًا؟</label>
         <div class="stepper">
           <button type="button" onclick="changeRevJuz(1)">+</button>
-          <div class="val" id="revJuzVal">5</div>
+          <div class="val" id="revJuzVal">٥</div>
           <button type="button" onclick="changeRevJuz(-1)">−</button>
         </div>
         <div class="hint">يساعدنا هذا في حساب الجزء المحدد لمراجعتك كل يوم بدقة</div>
@@ -255,8 +282,15 @@ const VERSES = [
   {text:"الَّذِينَ آتَيْنَاهُمُ الْكِتَابَ يَتْلُونَهُ حَقَّ تِلَاوَتِهِ أُولَٰئِكَ يُؤْمِنُونَ بِهِ", ref:"البقرة: 121"}
 ];
 
+// خطط الحفظ الجديد: تُحمَّل فعليًا من memorization_plans.json عند بدء الصفحة (انظر loadMemPlans)
+let MEM_PLANS_DATA = null;   // { p6m:{label,pagesPerDay,totalWeeks,totalMemDays,days:[],weeks:[]}, ... }
+let plansLoadFailed = false;
+
+// حالة متصفح الأسبوع/اليوم داخل لوحة الحفظ الجديد (مستقلة عن التاريخ الحقيقي)
+let viewedWeek = 1;      // رقم الأسبوع المعروض حاليًا
+let viewedSlot = null;   // الشريحة المختارة ضمن الأسبوع المعروض: {kind:'day', d} أو {kind:'friday', w}
+
 // فئات المراجعة: عدد أيام دورة المراجعة الكاملة (null = خطة شاملة بدون تقسيم أجزاء)
-// (لا تزال مؤقتة تقريبية بانتظار الأرقام الحقيقية لمسار "مراجعة" — القسم ٧ بملف السياق)
 const REVIEW_CATS = {
   t1:     {label:"أقل من ٥ أجزاء",   cycleDays:3},
   t2:     {label:"٥ إلى ١٠ أجزاء",   cycleDays:5},
@@ -269,11 +303,40 @@ let memState = null;
 let revState = null;
 let lastTrack = 'mem';
 let selectedRevJuz = 5;
-let MEM_PLAN_DATA = null;
 
 /* =====================================================================
    أدوات مساعدة عامة
    ===================================================================== */
+// تحويل أي رقم/نص إلى أرقام عربية هندية (٠١٢٣٤٥٦٧٨٩) لعرضها للزائر
+const AR_DIGITS = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+function ar(n){
+  return String(n).replace(/[0-9]/g, d => AR_DIGITS[+d]);
+}
+
+async function loadMemPlans(){
+  try{
+    const res = await fetch('memorization_plans.json');
+    if(!res.ok) throw new Error('bad status');
+    MEM_PLANS_DATA = await res.json();
+    // فهرسة سريعة: تجميع أيام كل أسبوع لكل خطة (بدون تعديل بيانات الملف الأصلية)
+    Object.values(MEM_PLANS_DATA).forEach(plan=>{
+      plan._daysByWeek = {};
+      plan.days.forEach(d=>{
+        (plan._daysByWeek[d.w] = plan._daysByWeek[d.w] || []).push(d);
+      });
+      // خريطة سريعة أعلى صفحة "حفظ جديد" تراكمية بعد كل يوم (لحساب التقدم الحقيقي)
+      let running = 0;
+      plan._cumNewAfter = plan.days.map(d=>{
+        if(d.new) running = d.new[1];
+        return running;
+      });
+    });
+    plansLoadFailed = false;
+  }catch(e){
+    plansLoadFailed = true;
+  }
+}
+
 function todayStr(){ return new Date().toISOString().slice(0,10); }
 function diffDays(a, b){ return Math.round((new Date(b) - new Date(a)) / 86400000); }
 function loadJSON(key){
@@ -315,7 +378,7 @@ function ensureFreshTaskDay(state){
    إدارة عرض الشاشات
    ===================================================================== */
 function showView(id){
-  ['chooser','mem-onboarding','mem-dashboard','rev-onboarding','rev-dashboard'].forEach(v=>{
+  ['loading-view','load-error-view','chooser','mem-onboarding','mem-dashboard','rev-onboarding','rev-dashboard'].forEach(v=>{
     document.getElementById(v).style.display = (v === id) ? 'block' : 'none';
   });
 }
@@ -389,65 +452,67 @@ function saveMemOnboarding(){
   showMemDashboard();
 }
 
-// عدد الأيام غير الجمعة (أيام الجدول الفعلية) بين تاريخين، النهاية غير شاملة
-function countNonFridayDays(start, endExclusive){
-  let count = 0;
-  const cursor = new Date(start);
-  while(cursor < endExclusive){
-    if(cursor.getDay() !== 5) count++;
-    cursor.setDate(cursor.getDate() + 1);
-  }
-  return count;
-}
+function getMemPlan(state){ return MEM_PLANS_DATA[state.planId]; }
 
-// أكبر صفحة "حفظ جديد" وصل إليها الزائر حتى نهاية اليوم رقم uptoIndex (١-index)، أو ٠ إن لم يبدأ بعد
-function pagesMemorizedThrough(days, uptoIndex){
-  for(let i = Math.min(uptoIndex, days.length) - 1; i >= 0; i--){
-    if(days[i].new) return days[i].new[1];
-  }
-  return 0;
-}
-
-function computeMemToday(state){
-  const planData = MEM_PLAN_DATA[state.planId];
+// اليوم/الأسبوع الحقيقيان محسوبان من التاريخ الفعلي (لا علاقة لهم بتصفح الزائر)
+function computeRealSlot(state){
+  const plan = getMemPlan(state);
   const start = new Date(state.startDate);
   const today = new Date(todayStr());
-  const todayDow = today.getDay();
-  const isFriday = todayDow === 5;
-  const totalDays = planData.days.length;
-  const elapsedBeforeToday = countNonFridayDays(start, today);
-  const completed = elapsedBeforeToday >= totalDays;
-  const dayIndex = elapsedBeforeToday + 1;
-  const dayEntry = (!isFriday && !completed && dayIndex <= totalDays) ? planData.days[dayIndex - 1] : null;
-  const weekNumber = Math.min(planData.weeks.length, Math.max(1, Math.ceil(elapsedBeforeToday / 6) || 1));
-  const weekEntry = planData.weeks[weekNumber - 1] || null;
-  const pagesDone = pagesMemorizedThrough(planData.days, elapsedBeforeToday);
-  return {planData, isFriday, completed, dayEntry, weekEntry, pagesDone};
+  let elapsed = 0; // عدد أيام الحفظ (غير الجمعة) المنقضية فعليًا قبل اليوم
+  let cursor = new Date(start);
+  while(cursor < today){
+    if(cursor.getDay() !== 5) elapsed++;
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  if(today.getDay() === 5){
+    const w = elapsed >= 1 ? plan.days[elapsed - 1].w : 1;
+    return {kind:'friday', w, afterD: elapsed};
+  }
+  const d = elapsed + 1;
+  if(d > plan.days.length){
+    return {kind:'completed'};
+  }
+  return {kind:'day', d, w: plan.days[d - 1].w};
 }
 
-function buildMemTasks(info){
-  if(info.completed){
-    return [{id:'done', title:'أتممت الختمة 🎉', desc:'نسأل الله أن يتقبل منك هذا الجهد المبارك'}];
+function slotsEqual(a, b){
+  if(!a || !b) return false;
+  if(a.kind !== b.kind) return false;
+  if(a.kind === 'day') return a.d === b.d;
+  if(a.kind === 'friday') return a.w === b.w;
+  return true;
+}
+
+// التقدّم الحقيقي (شريط التقدّم) دائمًا مبني على اليوم الحقيقي، بغض النظر عن التصفح
+function pagesDoneReal(state){
+  const plan = getMemPlan(state);
+  const real = computeRealSlot(state);
+  if(real.kind === 'completed') return PAGE_TOTAL;
+  if(real.kind === 'day') return real.d >= 2 ? plan._cumNewAfter[real.d - 2] : 0;
+  return real.afterD >= 1 ? plan._cumNewAfter[real.afterD - 1] : 0;
+}
+
+function slotTitle(slot, plan){
+  if(slot.kind === 'friday') return `الجمعة (الأسبوع ${ar(slot.w)})`;
+  const day = plan.days[slot.d - 1];
+  return `اليوم ${ar(day.d)} (اليوم ${ar(day.wd)} من الأسبوع ${ar(day.w)})`;
+}
+
+function buildSlotTasks(slot, plan){
+  if(slot.kind === 'friday'){
+    const week = plan.weeks[slot.w - 1];
+    const tasks = [{id:'weekly', title:'المراجعة الأسبوعية', desc:`من صفحة ${ar(week.weeklyReview[0])} إلى صفحة ${ar(week.weeklyReview[1])}`}];
+    if(week.extraCum){
+      tasks.push({id:'extraCum', title:'مراجعة تراكمية إضافية', desc:`من صفحة ${ar(week.extraCum[0])} إلى صفحة ${ar(week.extraCum[1])}`});
+    }
+    return tasks;
   }
-  if(info.isFriday){
-    const wr = info.weekEntry ? info.weekEntry.weeklyReview : null;
-    const desc = wr ? `راجع من صفحة ${wr[0]} إلى صفحة ${wr[1]}` : 'راجع كل ما حفظته هذا الأسبوع بالكامل';
-    return [{id:'weekly', title:'مراجعة أسبوعية', desc}];
-  }
-  const d = info.dayEntry;
+  const day = plan.days[slot.d - 1];
   const tasks = [];
-  if(d && d.new){
-    tasks.push({id:'new', title:'حفظ جديد', desc:`من صفحة ${d.new[0]} إلى صفحة ${d.new[1]}`});
-  }
-  if(d && d.near){
-    tasks.push({id:'near', title:'مراجعة قريبة', desc:`من صفحة ${d.near[0]} إلى صفحة ${d.near[1]}`});
-  }
-  if(d && d.cum){
-    tasks.push({id:'cum', title:'مراجعة تراكمية', desc:`من صفحة ${d.cum[0]} إلى صفحة ${d.cum[1]}`});
-  }
-  if(tasks.length === 0){
-    tasks.push({id:'rest', title:'يوم مراجعة', desc:'لا يوجد حفظ جديد اليوم، تابع مراجعتك المعتادة كما تحب'});
-  }
+  if(day.new)  tasks.push({id:'new',  title:'الحفظ الجديد',        desc:`من صفحة ${ar(day.new[0])} إلى صفحة ${ar(day.new[1])}`});
+  if(day.near) tasks.push({id:'near', title:'المراجعة القريبة',    desc:`من صفحة ${ar(day.near[0])} إلى صفحة ${ar(day.near[1])}`});
+  if(day.cum)  tasks.push({id:'cum',  title:'المراجعة التراكمية',  desc:`من صفحة ${ar(day.cum[0])} إلى صفحة ${ar(day.cum[1])}`});
   return tasks;
 }
 
@@ -455,6 +520,64 @@ function showMemDashboard(){
   showView('mem-dashboard');
   const switchBar = document.getElementById('trackSwitchMem');
   switchBar.style.display = revState ? 'block' : 'none';
+  // كل دخول جديد للوحة يبدأ من الأسبوع/اليوم الحقيقيين
+  const real = computeRealSlot(memState);
+  const plan = getMemPlan(memState);
+  if(real.kind === 'completed'){
+    viewedWeek = plan.totalWeeks;
+    viewedSlot = {kind:'day', d: plan.days.length};
+  } else {
+    viewedWeek = real.w;
+    viewedSlot = real;
+  }
+  renderMemDashboard();
+}
+
+function navWeek(delta){
+  const plan = getMemPlan(memState);
+  const target = viewedWeek + delta;
+  if(target < 1 || target > plan.totalWeeks) return;
+  viewedWeek = target;
+  const daysOfWeek = plan._daysByWeek[viewedWeek] || [];
+  viewedSlot = daysOfWeek.length ? {kind:'day', d: daysOfWeek[0].d} : {kind:'friday', w: viewedWeek};
+  renderMemDashboard();
+}
+
+function jumpToWeek(){
+  const plan = getMemPlan(memState);
+  const raw = document.getElementById('weekJumpInput').value.trim();
+  const normalized = raw.replace(/[٠-٩]/g, ch => AR_DIGITS.indexOf(ch));
+  const n = parseInt(normalized, 10);
+  if(!n || n < 1 || n > plan.totalWeeks){
+    alert(`أدخل رقم أسبوع بين ١ و${ar(plan.totalWeeks)}`);
+    return;
+  }
+  viewedWeek = n;
+  const daysOfWeek = plan._daysByWeek[viewedWeek] || [];
+  viewedSlot = daysOfWeek.length ? {kind:'day', d: daysOfWeek[0].d} : {kind:'friday', w: viewedWeek};
+  renderMemDashboard();
+}
+
+function selectDaySlot(d){
+  viewedSlot = {kind:'day', d};
+  renderMemDashboard();
+}
+
+function selectFridaySlot(w){
+  viewedSlot = {kind:'friday', w};
+  renderMemDashboard();
+}
+
+function backToRealToday(){
+  const plan = getMemPlan(memState);
+  const real = computeRealSlot(memState);
+  if(real.kind === 'completed'){
+    viewedWeek = plan.totalWeeks;
+    viewedSlot = {kind:'day', d: plan.days.length};
+  } else {
+    viewedWeek = real.w;
+    viewedSlot = real;
+  }
   renderMemDashboard();
 }
 
@@ -470,21 +593,31 @@ function renderMemDashboard(){
   document.getElementById('memVerseText').textContent = `«${v.text}»`;
   document.getElementById('memVerseRef').textContent = v.ref;
 
-  const info = computeMemToday(memState);
-  const plan = info.planData;
+  const plan = getMemPlan(memState);
+  const real = computeRealSlot(memState);
+  const completed = real.kind === 'completed';
+
   document.getElementById('memPlanLabel').textContent = `خطة ${plan.label}`;
-  document.getElementById('memPlanSub').textContent = info.completed
+  document.getElementById('memPlanSub').textContent = completed
     ? "أتممت حفظ القرآن كاملاً، بارك الله فيك"
-    : `تبدأ من ${memState.startDate} — ${plan.pagesPerDay} صفحة في كل يوم حفظ`;
+    : `تبدأ من ${ar(memState.startDate)} — ${ar(plan.pagesPerDay)} صفحة في كل يوم حفظ`;
 
-  const pct = Math.min(100, Math.round((info.pagesDone / PAGE_TOTAL) * 100));
+  const pagesDone = pagesDoneReal(memState);
+  const pct = Math.min(100, Math.round((pagesDone / PAGE_TOTAL) * 100));
   document.getElementById('memProgressFill').style.width = pct + '%';
-  document.getElementById('memProgressText').textContent = `${info.pagesDone} من ${PAGE_TOTAL} صفحة`;
-  document.getElementById('memProgressPct').textContent = pct + '%';
-  document.getElementById('memPagesDoneNum').textContent = info.pagesDone;
-  document.getElementById('memStreakNum').textContent = memState.streak;
+  document.getElementById('memProgressText').textContent = `${ar(pagesDone)} من ${ar(PAGE_TOTAL)} صفحة`;
+  document.getElementById('memProgressPct').textContent = ar(pct) + '%';
+  document.getElementById('memPagesDoneNum').textContent = ar(pagesDone);
+  document.getElementById('memStreakNum').textContent = ar(memState.streak);
 
-  renderMemTasks(info);
+  // متصفح الأسبوع/اليوم
+  document.getElementById('weekNavLabel').textContent = `الأسبوع ${ar(viewedWeek)} من ${ar(plan.totalWeeks)}`;
+  document.getElementById('weekPrevBtn').disabled = viewedWeek <= 1;
+  document.getElementById('weekNextBtn').disabled = viewedWeek >= plan.totalWeeks;
+  document.getElementById('weekJumpInput').value = '';
+  document.getElementById('weekJumpInput').placeholder = ar(viewedWeek);
+  renderDayStrip(plan, real);
+  renderDayDetailAndTasks(plan, real, completed);
 
   const ctaEl = document.getElementById('memAddTrackLink');
   ctaEl.innerHTML = revState ? '' :
@@ -492,13 +625,58 @@ function renderMemDashboard(){
     '<button type="button" class="btn btn-secondary" onclick="chooseTrack(\'review\')">الانتقال إلى جداول المراجعة</button>';
 }
 
-function renderMemTasks(info){
-  const tasks = buildMemTasks(info);
+function renderDayStrip(plan, real){
+  const namesByWd = {1:'السبت', 2:'الأحد', 3:'الاثنين', 4:'الثلاثاء', 5:'الأربعاء', 6:'الخميس'};
+  const daysOfWeek = plan._daysByWeek[viewedWeek] || [];
+  let html = '';
+  daysOfWeek.forEach(d=>{
+    const isToday = real.kind === 'day' && real.d === d.d;
+    const isViewed = viewedSlot && viewedSlot.kind === 'day' && viewedSlot.d === d.d;
+    const badges = [];
+    if(d.new) badges.push('<span class="badge-circle b-new">ح</span>');
+    if(d.near || d.cum) badges.push('<span class="badge-circle b-review">م</span>');
+    html += `<div class="day-chip ${isToday ? 'today' : ''} ${isViewed ? 'viewed' : ''}" onclick="selectDaySlot(${d.d})">
+      <div class="day-chip-name">${namesByWd[d.wd] || ''}</div>
+      <div class="day-chip-badges">${badges.join('')}</div>
+      ${isToday ? '<span class="day-chip-today-lbl">اليوم</span>' : ''}
+    </div>`;
+  });
+  const isFridayToday = real.kind === 'friday' && real.w === viewedWeek;
+  const isFridayViewed = viewedSlot && viewedSlot.kind === 'friday' && viewedSlot.w === viewedWeek;
+  html += `<div class="day-chip friday ${isFridayToday ? 'today' : ''} ${isFridayViewed ? 'viewed' : ''}" onclick="selectFridaySlot(${viewedWeek})">
+    <div class="day-chip-name">الجمعة</div>
+    <div class="day-chip-badges"><span class="badge-circle b-review">ج</span></div>
+    ${isFridayToday ? '<span class="day-chip-today-lbl">اليوم</span>' : ''}
+  </div>`;
+  document.getElementById('daysStrip').innerHTML = html;
+}
+
+function renderDayDetailAndTasks(plan, real, completed){
+  const previewEl = document.getElementById('previewBar');
+  const titleEl = document.getElementById('dayDetailTitle');
+  const listEl = document.getElementById('memTaskList');
+
+  if(completed){
+    titleEl.textContent = '';
+    previewEl.innerHTML = '';
+    listEl.innerHTML = `<div class="task disabled"><div class="check"></div><div class="body"><div class="title">أتممت الختمة 🎉</div><div class="desc">نسأل الله أن يتقبل منك هذا الجهد المبارك</div></div></div>`;
+    return;
+  }
+
+  const isReal = slotsEqual(real, viewedSlot);
+  titleEl.textContent = slotTitle(viewedSlot, plan);
+
+  previewEl.innerHTML = isReal ? '' :
+    `<span class="preview-badge">معاينة — ${slotTitle(viewedSlot, plan)}</span><button type="button" class="back-today-btn" onclick="backToRealToday()">العودة لليوم الحقيقي</button>`;
+
+  const tasks = buildSlotTasks(viewedSlot, plan);
   const status = memState.taskStatus.items;
-  document.getElementById('memTaskList').innerHTML = tasks.map(t=>{
-    const checked = !!status[t.id];
-    return `<div class="task ${checked?'checked':''}" onclick="toggleMemTask('${t.id}')">
-      <div class="check">${checked?'✓':''}</div>
+  listEl.innerHTML = tasks.map(t=>{
+    const checked = isReal && !!status[t.id];
+    const cls = isReal ? (checked ? 'checked' : '') : 'disabled';
+    const clickAttr = isReal ? ` onclick="toggleMemTask('${t.id}')"` : '';
+    return `<div class="task ${cls}"${clickAttr}>
+      <div class="check">${checked ? '✓' : ''}</div>
       <div class="body">
         <div class="title">${t.title}</div>
         <div class="desc">${t.desc}</div>
@@ -524,14 +702,14 @@ function toggleMemTask(id){
    ===================================================================== */
 function changeRevJuz(delta){
   selectedRevJuz = Math.min(30, Math.max(1, selectedRevJuz + delta));
-  document.getElementById('revJuzVal').textContent = selectedRevJuz;
+  document.getElementById('revJuzVal').textContent = ar(selectedRevJuz);
 }
 
 function showRevOnboarding(prefill){
   if(prefill && revState){
     document.getElementById('revName').value = revState.name || "";
     selectedRevJuz = revState.juzTotal;
-    document.getElementById('revJuzVal').textContent = selectedRevJuz;
+    document.getElementById('revJuzVal').textContent = ar(selectedRevJuz);
     document.querySelectorAll('#revCatGroup .pill').forEach(p=>{
       p.classList.toggle('active', p.dataset.val === revState.categoryId);
     });
@@ -582,7 +760,7 @@ function buildRevTasks(info, state){
     return [{id:'friday', title:'مراجعة الجمعة الخاصة', desc}];
   }
   if(info.cat.cycleDays){
-    return [{id:'cycle', title:'مراجعة اليوم', desc:`من الجزء ${info.fromJuz} إلى الجزء ${info.toJuz}`}];
+    return [{id:'cycle', title:'مراجعة اليوم', desc:`من الجزء ${ar(info.fromJuz)} إلى الجزء ${ar(info.toJuz)}`}];
   }
   return [{id:'daily', title:'مراجعة يومية', desc:'لا تقل عن وجه واحد من محفوظك مهما كانت مشاغلك'}];
 }
@@ -609,11 +787,11 @@ function renderRevDashboard(){
   const cat = REVIEW_CATS[revState.categoryId];
   document.getElementById('revPlanLabel').textContent = cat.label;
   document.getElementById('revPlanSub').textContent = cat.cycleDays
-    ? `دورة مراجعة كاملة كل ${cat.cycleDays} أيام على ${revState.juzTotal} جزء`
+    ? `دورة مراجعة كاملة كل ${ar(cat.cycleDays)} أيام على ${ar(revState.juzTotal)} جزء`
     : `مراجعة يومية عامة تناسب كل مستويات الحفظ`;
 
-  document.getElementById('revJuzTotalNum').textContent = revState.juzTotal;
-  document.getElementById('revStreakNum').textContent = revState.streak;
+  document.getElementById('revJuzTotalNum').textContent = ar(revState.juzTotal);
+  document.getElementById('revStreakNum').textContent = ar(revState.streak);
 
   const info = computeRevToday(revState);
   renderRevTasks(info);
@@ -654,7 +832,15 @@ function toggleRevTask(id){
 /* =====================================================================
    البداية
    ===================================================================== */
-function startApp(){
+async function init(){
+  showView('loading-view');
+  await loadMemPlans();
+
+  if(plansLoadFailed){
+    showView('load-error-view');
+    return;
+  }
+
   memState = loadJSON(MEM_KEY);
   revState = loadJSON(REV_KEY);
   lastTrack = loadJSON(LAST_KEY) || 'mem';
@@ -671,23 +857,8 @@ function startApp(){
     showRevDashboard();
   }
 }
-
-function init(){
-  fetch('memorization_plans.json')
-    .then(res => { if(!res.ok) throw new Error('fetch failed'); return res.json(); })
-    .then(data => {
-      MEM_PLAN_DATA = data;
-      startApp();
-    })
-    .catch(() => {
-      document.body.innerHTML = '<div class="page-head"><h1>تعذّر تحميل بيانات خطط الحفظ</h1>' +
-        '<p>تأكّد أن ملف memorization_plans.json موجود بنفس مجلد هذه الصفحة، وأنك تفتح الصفحة عبر خادم محلي (Live Server) وليس بالضغط المباشر على الملف.</p></div>';
-    });
-}
 init();
 </script>
-
-<a href="share-experience.html" class="share-fab" title="شاركنا تجربتك">💬</a>
 
 </body>
 </html>
