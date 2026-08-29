@@ -61,6 +61,21 @@ nav.main-nav{background:var(--navy);}
   font-weight:500;
 }
 
+/* زر قائمة الهمبرغر — يظهر فقط على الشاشات الصغيرة (انظر قواعد الاستجابة بالقسم ١٣) */
+.menu-toggle{
+  display:none;
+  background:transparent;
+  border:1.5px solid var(--gold);
+  color:var(--gold-light);
+  width:40px; height:40px;
+  border-radius:6px;
+  font-size:1.25rem;
+  cursor:pointer;
+  align-items:center; justify-content:center;
+  flex:none;
+}
+.menu-toggle:hover{background:rgba(255,255,255,0.08);}
+
 /* ============ ٤) الفوتر (موحّد لكل الصفحات) ============ */
 footer{
   background:var(--navy-deep); color:#c7d0da;
@@ -425,6 +440,18 @@ main{max-width:1000px; margin:0 auto; padding:40px 20px 80px;}
   .split{grid-template-columns:1fr;}
   .within-pair{grid-template-columns:1fr;}
   .track-choice{grid-template-columns:1fr;}
+
+  /* قائمة الهمبرغر: يظهر الزر، وتُطوى القائمة افتراضيًا */
+  .menu-toggle{display:flex;}
+  .main-nav ul{
+    display:none;
+    flex-direction:column;
+    gap:0;
+    padding:0;
+  }
+  .main-nav.open ul{display:flex;}
+  .main-nav a{border-bottom:1px solid rgba(255,255,255,0.08);}
+  .main-nav a:hover, .main-nav a.active{border-bottom-color:rgba(255,255,255,0.08);}
 }
 
 @media (max-width:520px){
@@ -445,8 +472,8 @@ main{max-width:1000px; margin:0 auto; padding:40px 20px 80px;}
   width:56px;
   height:56px;
   border-radius:50%;
-  background:var(--gold);
-  color:var(--navy-deep);
+  background:var(--navy-deep);
+  color:var(--gold-light);
   display:flex;
   align-items:center;
   justify-content:center;
@@ -457,7 +484,7 @@ main{max-width:1000px; margin:0 auto; padding:40px 20px 80px;}
   transition:transform .15s ease, background .15s ease;
 }
 .share-fab:hover{
-  background:var(--gold-light);
+  background:var(--navy);
   transform:scale(1.07);
 }
 
