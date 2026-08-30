@@ -189,20 +189,21 @@
       <div class="field">
         <label>كم جزءًا تحفظ تقريبًا؟</label>
         <div class="stepper">
-          <button type="button" onclick="changeRevJuz(1)">+</button>
+          <button type="button" onclick="changeRevJuz(0.25)">+</button>
           <div class="val" id="revJuzVal">٥</div>
-          <button type="button" onclick="changeRevJuz(-1)">−</button>
+          <button type="button" onclick="changeRevJuz(-0.25)">−</button>
         </div>
-        <div class="hint">يساعدنا هذا في حساب الجزء المحدد لمراجعتك كل يوم بدقة</div>
+        <div class="hint">يساعدنا هذا في حساب مقدار مراجعتك كل يوم بدقة (يمكن تحديد أرباع الجزء)</div>
       </div>
       <div class="field">
         <label>اختر فئة المراجعة المناسبة</label>
         <div class="pill-group" id="revCatGroup">
-          <button type="button" class="pill active" data-val="t1">أقل من ٥ أجزاء</button>
-          <button type="button" class="pill" data-val="t2">٥ إلى ١٠ أجزاء</button>
-          <button type="button" class="pill" data-val="t3">١٠ إلى ٢٠ جزءًا</button>
-          <button type="button" class="pill" data-val="t4">أكثر من ٢٠ جزءًا</button>
-          <button type="button" class="pill" data-val="shamla">خطة شاملة عامة</button>
+          <button type="button" class="pill active" data-val="beginner">المبتدئ <small>(أقل من 4 أجزاء)</small></button>
+          <button type="button" class="pill" data-val="level1">المستوى الأول <small>(حوالي 4–7 أجزاء)</small></button>
+          <button type="button" class="pill" data-val="level2">المستوى المتوسط <small>(حوالي 7–12 جزء)</small></button>
+          <button type="button" class="pill" data-val="level3">المستوى المتقدم <small>(حوالي 12–18 جزء)</small></button>
+          <button type="button" class="pill" data-val="level4">المستوى العالي <small>(حوالي 18–25 جزء)</small></button>
+          <button type="button" class="pill" data-val="khatm">خاتم الحفظ <small>(30 جزء)</small></button>
         </div>
       </div>
       <button class="primary-btn" onclick="saveRevOnboarding()">ابدأ متابعتي</button>
@@ -242,7 +243,11 @@
       <div class="sub" id="revPlanSub"></div>
     </div>
 
-    <div class="dash-label">مهام اليوم</div>
+    <div class="dash-label">أسبوعك (يتكرر كل أسبوع)</div>
+    <div class="day-strip" id="revDaysStrip"></div>
+
+    <div id="revPreviewBar"></div>
+    <div class="day-detail-title" id="revDayDetailTitle"></div>
     <div class="task-list" id="revTaskList"></div>
 
     <div class="streak-row">
@@ -291,19 +296,25 @@ let plansLoadFailed = false;
 let viewedWeek = 1;      // رقم الأسبوع المعروض حاليًا
 let viewedSlot = null;   // الشريحة المختارة ضمن الأسبوع المعروض: {kind:'day', d} أو {kind:'friday', w}
 
-// فئات المراجعة: عدد أيام دورة المراجعة الكاملة (null = خطة شاملة بدون تقسيم أجزاء)
-const REVIEW_CATS = {
-  t1:     {label:"أقل من ٥ أجزاء",   cycleDays:3},
-  t2:     {label:"٥ إلى ١٠ أجزاء",   cycleDays:5},
-  t3:     {label:"١٠ إلى ٢٠ جزءًا",  cycleDays:7},
-  t4:     {label:"أكثر من ٢٠ جزءًا", cycleDays:7},
-  shamla: {label:"خطة شاملة عامة",   cycleDays:null}
-};
+// فئات المراجعة: تُحمَّل فعليًا من review_categories.json عند بدء الصفحة (انظر loadReviewCats)
+let REVIEW_CATS_DATA = null; // { categories:{beginner:{...}, level1:{...}, ...}, generalNotes, revisionMethod }
+let reviewCatsLoadFailed = false;
+
+// أسماء أيام المراجعة (سبت=مؤشر٠ ... خميس=مؤشر٥)، الجمعة راحة دائمًا وليست ضمن هذا التسلسل
+const REVIEW_WEEKDAYS = [
+  {jsDay:6, name:'السبت'},
+  {jsDay:0, name:'الأحد'},
+  {jsDay:1, name:'الاثنين'},
+  {jsDay:2, name:'الثلاثاء'},
+  {jsDay:3, name:'الأربعاء'},
+  {jsDay:4, name:'الخميس'}
+];
 
 let memState = null;
 let revState = null;
 let lastTrack = 'mem';
 let selectedRevJuz = 5;
+let viewedRevIndex = null; // فهرس اليوم المعروض حاليًا بمعاينة أسبوع المراجعة (0..5)، أو 'friday'
 
 /* =====================================================================
    أدوات مساعدة عامة
@@ -335,6 +346,17 @@ async function loadMemPlans(){
     plansLoadFailed = false;
   }catch(e){
     plansLoadFailed = true;
+  }
+}
+
+async function loadReviewCats(){
+  try{
+    const res = await fetch('review_categories.json');
+    if(!res.ok) throw new Error('bad status');
+    REVIEW_CATS_DATA = await res.json();
+    reviewCatsLoadFailed = false;
+  }catch(e){
+    reviewCatsLoadFailed = true;
   }
 }
 
@@ -701,19 +723,29 @@ function toggleMemTask(id){
 /* =====================================================================
    مسار: مراجعة
    ===================================================================== */
+// تنسيق عدد الأجزاء بأرقام عربية مع كسر الربع/النصف/ثلاثة أرباع إن وُجد
+function formatJuzAmount(value){
+  const whole = Math.floor(value + 1e-9);
+  const frac = Math.round((value - whole) * 4); // 0..3 من الأرباع
+  const fracSymbols = {0:'', 1:' ¼', 2:' ½', 3:' ¾'};
+  return `${ar(whole)}${fracSymbols[frac] || ''}`;
+}
+
 function changeRevJuz(delta){
-  selectedRevJuz = Math.min(30, Math.max(1, selectedRevJuz + delta));
-  document.getElementById('revJuzVal').textContent = ar(selectedRevJuz);
+  selectedRevJuz = Math.min(30, Math.max(0.25, Math.round((selectedRevJuz + delta) * 4) / 4));
+  document.getElementById('revJuzVal').textContent = formatJuzAmount(selectedRevJuz);
 }
 
 function showRevOnboarding(prefill){
   if(prefill && revState){
     document.getElementById('revName').value = revState.name || "";
     selectedRevJuz = revState.juzTotal;
-    document.getElementById('revJuzVal').textContent = ar(selectedRevJuz);
+    document.getElementById('revJuzVal').textContent = formatJuzAmount(selectedRevJuz);
     document.querySelectorAll('#revCatGroup .pill').forEach(p=>{
       p.classList.toggle('active', p.dataset.val === revState.categoryId);
     });
+  } else {
+    document.getElementById('revJuzVal').textContent = formatJuzAmount(selectedRevJuz);
   }
   showView('rev-onboarding');
 }
@@ -721,7 +753,7 @@ function showRevOnboarding(prefill){
 function saveRevOnboarding(){
   const name = document.getElementById('revName').value.trim();
   const activePill = document.querySelector('#revCatGroup .pill.active');
-  const categoryId = activePill ? activePill.dataset.val : 't1';
+  const categoryId = activePill ? activePill.dataset.val : 'beginner';
   const existing = revState || {};
   revState = {
     name: name || existing.name || "",
@@ -738,38 +770,96 @@ function saveRevOnboarding(){
   showRevDashboard();
 }
 
-function computeRevToday(state){
-  const todayDow = new Date(todayStr()).getDay();
-  const isFriday = todayDow === 5;
-  const cat = REVIEW_CATS[state.categoryId];
-  if(cat.cycleDays){
-    const daysSince = diffDays(state.startDate, todayStr());
-    const dayInCycle = ((daysSince % cat.cycleDays) + cat.cycleDays) % cat.cycleDays;
-    const juzPerDay = state.juzTotal / cat.cycleDays;
-    const fromJuz = Math.max(1, Math.round(dayInCycle * juzPerDay) + 1);
-    const toJuz = Math.max(fromJuz, Math.min(state.juzTotal, Math.round((dayInCycle + 1) * juzPerDay)));
-    return {cat, isFriday, fromJuz, toJuz};
-  }
-  return {cat, isFriday};
+// فهرس اليوم الحقيقي الحالي ضمن أسبوع المراجعة: 0..5 (سبت..خميس)، أو 'friday'، أو null (لن يحدث)
+function realRevIndex(){
+  const jsDay = new Date(todayStr()).getDay();
+  if(jsDay === 5) return 'friday';
+  return REVIEW_WEEKDAYS.findIndex(d => d.jsDay === jsDay);
 }
 
-function buildRevTasks(info, state){
-  if(info.isFriday){
-    const desc = state.categoryId === 'shamla'
-      ? 'قيّم نفسك: ما الذي ضعف هذا الأسبوع؟ وأعد جدولة مراجعته'
-      : 'مراجعة عشوائية (فتح المصحف من مواضع متفرقة) أو تسميع لأحد لاختبار ثبات محفوظك';
-    return [{id:'friday', title:'مراجعة الجمعة الخاصة', desc}];
+// حساب مدى المراجعة (بالأرباع) لفهرس يوم معيّن: تقسيم متساوٍ لإجمالي أرباع محفوظه على 6 أيام (سبت..خميس)
+function computeRevRangeForIndex(index, totalQuarters){
+  const rate = Math.ceil(totalQuarters / 6);
+  const fromQ = index * rate + 1;
+  if(fromQ > totalQuarters) return null; // لا يوجد ما يكفي لتغطية هذا اليوم (محفوظ ضئيل جدًا)
+  const toQ = Math.min(totalQuarters, (index + 1) * rate);
+  return {fromQ, toQ};
+}
+
+// تحويل مدى بالأرباع إلى نص عرض بشري، حسب وحدة الفئة (ربع أو جزء)
+function formatRevRange(fromQ, toQ, unit){
+  if(unit === 'quarter'){
+    return fromQ === toQ ? `الربع ${ar(fromQ)}` : `من الربع ${ar(fromQ)} إلى الربع ${ar(toQ)}`;
   }
-  if(info.cat.cycleDays){
-    return [{id:'cycle', title:'مراجعة اليوم', desc:`من الجزء ${ar(info.fromJuz)} إلى الجزء ${ar(info.toJuz)}`}];
+  const startJuz = Math.ceil(fromQ / 8);
+  const startQtr = ((fromQ - 1) % 8) + 1; // 1..8: موضع بداية القراءة داخل جزء البداية
+  const endJuz = Math.ceil(toQ / 8);
+  const endQtr = ((toQ - 1) % 8) + 1;     // 1..8: موضع نهاية القراءة داخل جزء النهاية
+
+  // نطاق كامل ضمن نفس الجزء فقط
+  if(startJuz === endJuz){
+    if(startQtr === endQtr) return `الربع ${ar(startQtr)} من الجزء ${ar(startJuz)}`;
+    if(startQtr === 1 && endQtr === 8) return `الجزء ${ar(startJuz)}`;
+    if(startQtr === 1 && endQtr === 4) return `نصف الجزء ${ar(startJuz)}`;
+    if(startQtr === 5 && endQtr === 8) return `باقي الجزء ${ar(startJuz)}`;
+    return `من الربع ${ar(startQtr)} إلى الربع ${ar(endQtr)} من الجزء ${ar(startJuz)}`;
   }
-  return [{id:'daily', title:'مراجعة يومية', desc:'لا تقل عن وجه واحد من محفوظك مهما كانت مشاغلك'}];
+
+  const parts = [];
+  let fullStart = startJuz, fullEnd = endJuz;
+
+  if(startQtr === 5){ parts.push(`باقي الجزء ${ar(startJuz)}`); fullStart = startJuz + 1; }
+  else if(startQtr !== 1){ parts.push(`من الربع ${ar(startQtr)} من الجزء ${ar(startJuz)}`); fullStart = startJuz + 1; }
+
+  if(endQtr === 4) fullEnd = endJuz - 1;
+  else if(endQtr !== 8) fullEnd = endJuz - 1;
+
+  if(fullStart <= fullEnd){
+    if(fullStart === fullEnd) parts.push(`الجزء ${ar(fullStart)}`);
+    else if(fullEnd - fullStart === 1) parts.push(`الجزء ${ar(fullStart)} و${ar(fullEnd)}`);
+    else parts.push(`من الجزء ${ar(fullStart)} إلى الجزء ${ar(fullEnd)}`);
+  }
+
+  if(endQtr === 4) parts.push(`نصف الجزء ${ar(endJuz)}`);
+  else if(endQtr !== 8) parts.push(`إلى الربع ${ar(endQtr)} من الجزء ${ar(endJuz)}`);
+
+  return parts.join(' + ');
+}
+
+// السلسلة المتتالية بمسار المراجعة: الجمعة يوم راحة مستثنى، فلا يكسر التتابع
+function nextRequiredReviewDate(dateStr){
+  const d = new Date(dateStr);
+  d.setDate(d.getDate() + 1);
+  if(d.getDay() === 5) d.setDate(d.getDate() + 1);
+  return d.toISOString().slice(0, 10);
+}
+function updateReviewStreak(state){
+  const today = todayStr();
+  if(state.lastStreakDate === today) return;
+  if(state.lastStreakDate){
+    const expected = nextRequiredReviewDate(state.lastStreakDate);
+    state.streak = (today === expected) ? state.streak + 1 : 1;
+  } else {
+    state.streak = 1;
+  }
+  state.lastStreakDate = today;
 }
 
 function showRevDashboard(){
   showView('rev-dashboard');
   const switchBar = document.getElementById('trackSwitchRev');
   switchBar.style.display = memState ? 'block' : 'none';
+  viewedRevIndex = realRevIndex(); // كل دخول جديد للوحة يبدأ من اليوم الحقيقي
+  renderRevDashboard();
+}
+
+function selectRevIndex(index){
+  viewedRevIndex = index;
+  renderRevDashboard();
+}
+
+function backToRealRevToday(){
+  viewedRevIndex = realRevIndex();
   renderRevDashboard();
 }
 
@@ -785,17 +875,16 @@ function renderRevDashboard(){
   document.getElementById('revVerseText').textContent = `«${v.text}»`;
   document.getElementById('revVerseRef').textContent = v.ref;
 
-  const cat = REVIEW_CATS[revState.categoryId];
+  const cat = REVIEW_CATS_DATA.categories[revState.categoryId];
   document.getElementById('revPlanLabel').textContent = cat.label;
-  document.getElementById('revPlanSub').textContent = cat.cycleDays
-    ? `دورة مراجعة كاملة كل ${ar(cat.cycleDays)} أيام على ${ar(revState.juzTotal)} جزء`
-    : `مراجعة يومية عامة تناسب كل مستويات الحفظ`;
+  document.getElementById('revPlanSub').textContent = `نقسّم محفوظك (${formatJuzAmount(revState.juzTotal)} جزء) بالتساوي على ٦ أيام (السبت إلى الخميس) — والجمعة راحة كاملة`;
 
-  document.getElementById('revJuzTotalNum').textContent = ar(revState.juzTotal);
+  document.getElementById('revJuzTotalNum').textContent = formatJuzAmount(revState.juzTotal);
   document.getElementById('revStreakNum').textContent = ar(revState.streak);
 
-  const info = computeRevToday(revState);
-  renderRevTasks(info);
+  const real = realRevIndex();
+  renderRevDayStrip(real);
+  renderRevDayDetailAndTasks(cat, real);
 
   const ctaEl = document.getElementById('revAddTrackLink');
   ctaEl.innerHTML = memState ? '' :
@@ -803,19 +892,64 @@ function renderRevDashboard(){
     '<button type="button" class="btn btn-secondary" onclick="chooseTrack(\'mem\')">الانتقال إلى خطط الحفظ الجديد</button>';
 }
 
-function renderRevTasks(info){
-  const tasks = buildRevTasks(info, revState);
-  const status = revState.taskStatus.items;
-  document.getElementById('revTaskList').innerHTML = tasks.map(t=>{
-    const checked = !!status[t.id];
-    return `<div class="task ${checked?'checked':''}" onclick="toggleRevTask('${t.id}')">
-      <div class="check">${checked?'✓':''}</div>
-      <div class="body">
-        <div class="title">${t.title}</div>
-        <div class="desc">${t.desc}</div>
-      </div>
+function renderRevDayStrip(real){
+  let html = '';
+  REVIEW_WEEKDAYS.forEach((d, idx)=>{
+    const isToday = real === idx;
+    const isViewed = viewedRevIndex === idx;
+    html += `<div class="day-chip ${isToday ? 'today' : ''} ${isViewed ? 'viewed' : ''}" onclick="selectRevIndex(${idx})">
+      <div class="day-chip-name">${d.name}</div>
+      <div class="day-chip-badges"><span class="badge-circle b-review">م</span></div>
+      ${isToday ? '<span class="day-chip-today-lbl">اليوم</span>' : ''}
     </div>`;
-  }).join('');
+  });
+  const isFridayToday = real === 'friday';
+  const isFridayViewed = viewedRevIndex === 'friday';
+  html += `<div class="day-chip friday ${isFridayToday ? 'today' : ''} ${isFridayViewed ? 'viewed' : ''}" onclick="selectRevIndex('friday')">
+    <div class="day-chip-name">الجمعة</div>
+    <div class="day-chip-badges"><span class="badge-circle b-review">ر</span></div>
+    ${isFridayToday ? '<span class="day-chip-today-lbl">اليوم</span>' : ''}
+  </div>`;
+  document.getElementById('revDaysStrip').innerHTML = html;
+}
+
+function renderRevDayDetailAndTasks(cat, real){
+  const previewEl = document.getElementById('revPreviewBar');
+  const titleEl = document.getElementById('revDayDetailTitle');
+  const listEl = document.getElementById('revTaskList');
+  const isReal = viewedRevIndex === real;
+  const dayLabel = viewedRevIndex === 'friday' ? 'الجمعة' : REVIEW_WEEKDAYS[viewedRevIndex].name;
+
+  titleEl.textContent = dayLabel;
+  previewEl.innerHTML = isReal ? '' :
+    `<span class="preview-badge">معاينة — ${dayLabel}</span><button type="button" class="back-today-btn" onclick="backToRealRevToday()">العودة لليوم الحقيقي</button>`;
+
+  if(viewedRevIndex === 'friday'){
+    listEl.innerHTML = `<div class="task disabled"><div class="check"></div><div class="body"><div class="title">يوم راحة 🌿</div><div class="desc">الجمعة استراحة كاملة من مراجعة الورد — لا تُحسب عليك، ولا تكسر سلسلتك المتتالية</div></div></div>`;
+    return;
+  }
+
+  const totalQuarters = Math.round(revState.juzTotal * 8);
+  const range = computeRevRangeForIndex(viewedRevIndex, totalQuarters);
+  const status = revState.taskStatus.items;
+  const taskId = 'day' + viewedRevIndex;
+
+  if(!range){
+    listEl.innerHTML = `<div class="task disabled"><div class="check"></div><div class="body"><div class="title">لا يوجد مقدار لهذا اليوم</div><div class="desc">محفوظك الحالي صغير جدًا ليُقسَّم على ٦ أيام كاملة — راجع أي وجه أو صفحة إضافية اختياريًا</div></div></div>`;
+    return;
+  }
+
+  const desc = formatRevRange(range.fromQ, range.toQ, cat.unit);
+  const checked = isReal && !!status[taskId];
+  const cls = isReal ? (checked ? 'checked' : '') : 'disabled';
+  const clickAttr = isReal ? ` onclick="toggleRevTask('${taskId}')"` : '';
+  listEl.innerHTML = `<div class="task ${cls}"${clickAttr}>
+    <div class="check">${checked ? '✓' : ''}</div>
+    <div class="body">
+      <div class="title">مراجعة اليوم</div>
+      <div class="desc">${desc}</div>
+    </div>
+  </div>`;
 }
 
 function toggleRevTask(id){
@@ -824,7 +958,7 @@ function toggleRevTask(id){
   items[id] = !items[id];
   const hasAnyCheckedNow = Object.values(items).some(v=>v);
   if(!hadAnyChecked && hasAnyCheckedNow){
-    updateStreak(revState);
+    updateReviewStreak(revState);
   }
   saveJSON(REV_KEY, revState);
   renderRevDashboard();
@@ -835,9 +969,9 @@ function toggleRevTask(id){
    ===================================================================== */
 async function init(){
   showView('loading-view');
-  await loadMemPlans();
+  await Promise.all([loadMemPlans(), loadReviewCats()]);
 
-  if(plansLoadFailed){
+  if(plansLoadFailed || reviewCatsLoadFailed){
     showView('load-error-view');
     return;
   }

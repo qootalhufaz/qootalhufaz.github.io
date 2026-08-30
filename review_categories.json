@@ -1,0 +1,57 @@
+{
+  "generalNotes": [
+    "الجدول أسبوعي متكرر: يبدأ الحافظ كل سبت من بداية محفوظه ويتابع بالتسلسل.",
+    "الجمعة استراحة كاملة لكل الفئات، بدون أي مهمة مراجعة."
+  ],
+  "revisionMethod": "يُسمّع الحافظ المقدار المقرر غيباً بصوت مسموع. عند وقوع أي خطأ أو توقف: ينظر إلى المصحف ليصحح الموضع فوراً، ثم يعيد الموضع الخاطئ عشر مرات (ثلاث مرات بالنظر إلى المصحف وسبع مرات غيباً)، ثم يستمر في التسميع من حيث توقف. يُفضل تدوين المواضع الضعيفة لمراجعتها لاحقاً، مع الحرص على الربط بين الآيات والصفحات.",
+  "categories": {
+    "beginner": {
+      "id": "beginner",
+      "label": "المبتدئ",
+      "range": "أقل من 4 أجزاء",
+      "unit": "quarter",
+      "dailyRateQuarters": 5,
+      "dailyAmountLabel": "5 أرباع"
+    },
+    "level1": {
+      "id": "level1",
+      "label": "المستوى الأول",
+      "range": "حوالي 4–7 أجزاء",
+      "unit": "juz",
+      "dailyRateQuarters": 8,
+      "dailyAmountLabel": "جزء واحد"
+    },
+    "level2": {
+      "id": "level2",
+      "label": "المستوى المتوسط",
+      "range": "حوالي 7–12 جزء",
+      "unit": "juz",
+      "dailyRateQuarters": 12,
+      "dailyAmountLabel": "جزء ونصف"
+    },
+    "level3": {
+      "id": "level3",
+      "label": "المستوى المتقدم",
+      "range": "حوالي 12–18 جزء",
+      "unit": "juz",
+      "dailyRateQuarters": 16,
+      "dailyAmountLabel": "جزءان"
+    },
+    "level4": {
+      "id": "level4",
+      "label": "المستوى العالي",
+      "range": "حوالي 18–25 جزء",
+      "unit": "juz",
+      "dailyRateQuarters": 24,
+      "dailyAmountLabel": "3 أجزاء"
+    },
+    "khatm": {
+      "id": "khatm",
+      "label": "خاتم الحفظ",
+      "range": "30 جزء",
+      "unit": "juz",
+      "dailyRateQuarters": 40,
+      "dailyAmountLabel": "5 أجزاء"
+    }
+  }
+}
