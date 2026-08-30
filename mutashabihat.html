@@ -169,48 +169,6 @@
     color:var(--ink-soft);
   }
 
-  /* ===== داخل السورة (نموذج توضيحي مؤقت) ===== */
-  .demo-flag{
-    display:inline-block;
-    background:#fff3cd;
-    color:#7a5c00;
-    border:1px solid #e9d38b;
-    font-size:.8rem;
-    padding:4px 10px;
-    border-radius:6px;
-    margin-bottom:18px;
-  }
-  .within-card{
-    background:var(--panel);
-    border:1px solid var(--line);
-    border-radius:12px;
-    padding:20px;
-    margin-bottom:18px;
-  }
-  .within-pair{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:16px;
-    margin-bottom:14px;
-  }
-  @media (max-width:700px){
-    .within-pair{grid-template-columns:1fr;}
-  }
-  .within-verse{
-    background:var(--green-tint);
-    border-radius:8px;
-    padding:14px;
-  }
-  .within-verse .ref{
-    font-size:.85rem;
-    font-weight:700;
-    color:var(--navy);
-    margin-bottom:6px;
-  }
-  .within-verse .txt{
-    font-family:'Amiri', serif;
-    font-size:1.2rem;
-  }
   .quiz-btn{
     font-family:'Tajawal', sans-serif;
     font-size:.9rem;
@@ -278,24 +236,26 @@
     </div>
   </section>
 
-  <!-- ============ داخل السورة: نموذج توضيحي ============ -->
+  <!-- ============ داخل السورة: متشابهات السورة مع نفسها ============ -->
   <section id="section-within" class="subsection">
-    <span class="demo-flag">⚠ نموذج توضيحي مؤقت — المحتوى الفعلي لم يُبنَ بعد</span>
     <h2 class="msh-title">متشابهات آيات السورة مع نفسها</h2>
-    <p class="msh-desc">هذا القسم بانتظار الفكرة والبيانات الفعلية. المثال أدناه توضيحي فقط لشكل العرض المستقبلي.</p>
+    <p class="msh-desc">مواضع مختارة داخل السورة نفسها يكثر فيها الخلط أثناء الحفظ — اختر السورة، ثم اختر القسم، وحاول تتذكر الفرق بين المواضع قبل ما تفتح البطاقة.</p>
 
-    <div class="within-card">
-      <div class="within-pair">
-        <div class="within-verse">
-          <div class="ref">سورة البقرة، آية ٢</div>
-          <div class="txt">ذَٰلِكَ الْكِتَابُ لَا رَيْبَ ۛ فِيهِ ۛ هُدًى لِّلْمُتَّقِينَ</div>
-        </div>
-        <div class="within-verse">
-          <div class="ref">سورة البقرة، آية ١٨٥ (مثال توضيحي)</div>
-          <div class="txt">هُدًى لِّلنَّاسِ وَبَيِّنَاتٍ مِّنَ الْهُدَىٰ وَالْفُرْقَانِ</div>
-        </div>
-      </div>
-      <button class="quiz-btn">اختبر نفسك في هذه المجموعة</button>
+    <div class="within-surah-row">
+      <label for="withinSurahSelect">السورة:</label>
+      <select id="withinSurahSelect">
+        <option value="">اختر سورة...</option>
+      </select>
+    </div>
+
+    <div class="within-subtabs" id="withinSubtabs">
+      <button data-cat="beginnings" class="active">متشابهات البدايات</button>
+      <button data-cat="middles">متشابهات الوسط</button>
+      <button data-cat="endings">متشابهات النهايات</button>
+    </div>
+
+    <div id="withinCardsArea">
+      <div class="within-empty">اختر سورة من الأعلى لعرض متشابهاتها.</div>
     </div>
   </section>
 
@@ -347,7 +307,7 @@
       console.error(err);
     }
   }
-  loadData();
+  loadData().then(loadWithinData);
 
   // ---------- تطبيع النص (إزالة التشكيل وتوحيد الحروف) ----------
   function normalize(text){
@@ -457,10 +417,165 @@
   searchInput.addEventListener('keydown', e => {
     if(e.key === 'Enter') runSearch();
   });
+
+  // ================================================================
+  // متشابهات السورة مع نفسها (بدايات / وسط / نهايات)
+  // ================================================================
+  let withinData = { beginnings: [], middles: [], endings: [] };
+  let withinCurrentCat = 'beginnings';
+  let withinCurrentSurah = '';
+
+  const withinSurahSelect = document.getElementById('withinSurahSelect');
+  const withinSubtabs = document.getElementById('withinSubtabs');
+  const withinCardsArea = document.getElementById('withinCardsArea');
+
+  async function loadWithinData(){
+    try{
+      const res = await fetch('mutashabihat_within.json');
+      withinData = await res.json();
+      buildWithinSurahOptions();
+    }catch(err){
+      withinCardsArea.innerHTML = '<div class="within-empty">تعذّر تحميل بيانات هذا القسم.</div>';
+      console.error(err);
+    }
+  }
+
+  function buildWithinSurahOptions(){
+    // نجمع كل أرقام السور الموجودة بأي قسم من الأقسام الثلاثة
+    const surahSet = new Set();
+    ['beginnings','middles','endings'].forEach(cat => {
+      (withinData[cat] || []).forEach(group => surahSet.add(group.surah));
+    });
+    const surahNumbers = Array.from(surahSet).sort((a,b) => a - b);
+
+    withinSurahSelect.innerHTML = '<option value="">اختر سورة...</option>';
+    surahNumbers.forEach(num => {
+      const name = surahNames[num] || ('سورة رقم ' + num);
+      const opt = document.createElement('option');
+      opt.value = num;
+      opt.textContent = name;
+      withinSurahSelect.appendChild(opt);
+    });
+  }
+
+  withinSurahSelect.addEventListener('change', () => {
+    withinCurrentSurah = withinSurahSelect.value;
+    renderWithinCards();
+  });
+
+  withinSubtabs.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      withinSubtabs.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      withinCurrentCat = btn.dataset.cat;
+      renderWithinCards();
+    });
+  });
+
+  function renderWithinCards(){
+    if(!withinCurrentSurah){
+      withinCardsArea.innerHTML = '<div class="within-empty">اختر سورة من الأعلى لعرض متشابهاتها.</div>';
+      return;
+    }
+    const groups = (withinData[withinCurrentCat] || []).filter(g => String(g.surah) === String(withinCurrentSurah));
+    if(groups.length === 0){
+      withinCardsArea.innerHTML = '<div class="within-empty">لا توجد متشابهات مُدخلة بهذا القسم لهذه السورة بعد.</div>';
+      return;
+    }
+
+    let html = '';
+    groups.forEach((group, idx) => {
+      const surahName = surahNames[group.surah] || ('سورة رقم ' + group.surah);
+      const hasLink = !!(group.link && group.link.trim());
+      html += `
+        <div class="wcard" data-idx="${idx}">
+          ${hasLink ? `<button class="wcard-bell" title="فيه رابط مساعد على الحفظ" aria-label="عرض الرابط المساعد">🔔</button>
+          <div class="wcard-bell-tip">${escapeHtml(group.link)}</div>` : ''}
+          <button class="wcard-head">
+            <span><span class="wcard-phrase">${escapeHtml(group.phrase)}</span><span class="wcard-count">(${group.verses.length} مواضع)</span></span>
+            <span class="wcard-chevron">▾</span>
+          </button>
+          <div class="wcard-body">
+            ${group.verses.map(v => `
+              <div class="wcard-verse">
+                <div class="ref">سورة ${surahName}، آية ${toArabicDigits(v.aya)}</div>
+                <div class="txt">${highlightPhraseSpan(v.text, group.phrase)}</div>
+              </div>`).join('')}
+            ${hasLink ? `<div class="wcard-link-box">🔔 ${escapeHtml(group.link)}</div>` : ''}
+          </div>
+        </div>`;
+    });
+    withinCardsArea.innerHTML = html;
+
+    // فتح/إغلاق البطاقة (أكورديون متعدد الفتح)
+    withinCardsArea.querySelectorAll('.wcard-head').forEach(head => {
+      head.addEventListener('click', () => {
+        head.closest('.wcard').classList.toggle('open');
+      });
+    });
+
+    // جرس الرابط المساعد: تبديل ظهور التلميح بدون فتح/إغلاق البطاقة
+    withinCardsArea.querySelectorAll('.wcard-bell').forEach(bell => {
+      bell.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const tip = bell.nextElementSibling;
+        const wasOpen = tip.classList.contains('show');
+        withinCardsArea.querySelectorAll('.wcard-bell-tip.show').forEach(t => t.classList.remove('show'));
+        if(!wasOpen) tip.classList.add('show');
+      });
+    });
+  }
+
+  // إغلاق أي تلميح جرس مفتوح عند الضغط خارج البطاقات
+  document.addEventListener('click', () => {
+    withinCardsArea.querySelectorAll('.wcard-bell-tip.show').forEach(t => t.classList.remove('show'));
+  });
+
+  // دمج الألفات، وإزالة التطويل/المسافات كليًا، ثم مطابقة حرف بحرف
+  // هذا يعالج التصاق كلمات بالرسم العثماني (مثل "يا أيها" التي تُكتب متلاصقة بلا ألف مستقلة لـ"يا")
+  function buildNormMap(text){
+    let norm = '';
+    const map = [];
+    for(let i = 0; i < text.length; i++){
+      let ch = text[i];
+      if(/[\u064B-\u065F\u0670\u06D6-\u06ED\u0640\s]/.test(ch)) continue;
+      if(/[إأآٱا]/.test(ch)) ch = 'ا';
+      else if(ch === 'ى') ch = 'ي';
+      else if(ch === 'ة') ch = 'ه';
+      else if(ch === 'ؤ') ch = 'و';
+      else if(ch === 'ئ') ch = 'ي';
+      if(ch === 'ا' && norm.length && norm[norm.length - 1] === 'ا') continue;
+      norm += ch;
+      map.push(i);
+    }
+    return { norm, map };
+  }
+
+  function highlightPhraseSpan(tashkeelText, phrase){
+    const { norm: textNorm, map } = buildNormMap(tashkeelText);
+    const { norm: qNorm } = buildNormMap(phrase);
+    if(!qNorm) return tashkeelText;
+    const pos = textNorm.indexOf(qNorm);
+    if(pos === -1) return tashkeelText; // ما لقينا تطابق؛ نعرض النص كما هو بدون تظليل
+    const start = map[pos];
+    const end = map[pos + qNorm.length - 1];
+    return tashkeelText.slice(0, start) + '<mark>' + tashkeelText.slice(start, end + 1) + '</mark>' + tashkeelText.slice(end + 1);
+  }
+
+  function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function toArabicDigits(num){
+    const arabicDigits = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+    return String(num).replace(/[0-9]/g, d => arabicDigits[d]);
+  }
+
 </script>
 
 <a href="share-experience.html" class="share-fab" title="شاركنا تجربتك">💬</a>
 
-<!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "39f866db1f5d42de9522ed9c44520408"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
 </html>
