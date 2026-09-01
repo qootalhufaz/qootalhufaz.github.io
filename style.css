@@ -30,6 +30,22 @@ body{
 h1,h2,h3{ font-family:'Amiri', serif; font-weight:700; color:var(--navy-deep); }
 a{color:inherit; text-decoration:none;}
 
+/* ============ ٢-ب) شريط البسملة (افتتاحية مستقلة، موحّدة لكل الصفحات) ============ */
+.bismillah-banner{
+  background:var(--paper);
+  text-align:center;
+  padding:30px 24px;
+  border-bottom:2px solid var(--gold);
+}
+.bismillah-banner p{
+  font-family:'Amiri', serif;
+  font-weight:700;
+  font-size:1.6rem;
+  color:var(--gold);
+  letter-spacing:1px;
+  margin:0;
+}
+
 /* ============ ٣) الهيدر + شريط التنقل (موحّد لكل الصفحات) ============ */
 header{
   background:var(--navy-deep);
@@ -83,7 +99,6 @@ footer{
   border-top:3px solid var(--gold);
 }
 footer .brand{color:var(--gold-light); font-family:'Amiri',serif; font-size:1.2rem; display:block; margin-bottom:10px;}
-footer .copyright{display:block; margin-top:14px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.15); font-size:0.8rem; color:#8fa0ad;}
 
 /* ============ ٥) أزرار عامة (تُستخدم بالصفحة الرئيسية والأقسام) ============ */
 .btn{
@@ -694,3 +709,13 @@ main{max-width:1000px; margin:0 auto; padding:40px 20px 80px;}
 .wcard-bell-tip.show{
   display:block;
 }
+
+/* ============ ١٦) صفحات "قريبًا" (أسباب النزول / الدلالات اللغوية / تحسين الذاكرة) ============ */
+.coming-soon{
+  max-width:640px; margin:0 auto; padding:90px 24px;
+  text-align:center;
+}
+.coming-soon .cs-icon{ font-size:2.6rem; margin-bottom:20px; }
+.coming-soon h1{ font-size:1.9rem; margin-bottom:14px; }
+.coming-soon p{ color:var(--ink-soft); font-size:1.05rem; margin-bottom:28px; }
+.coming-soon .btn{ display:inline-block; }
