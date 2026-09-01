@@ -506,6 +506,26 @@ function saveMemOnboarding(){
 
 function getMemPlan(state){ return MEM_PLANS_DATA[state.planId]; }
 
+// يحسب تاريخ التقويم الفعلي لليوم التسلسلي رقم seqD ضمن خطة الحفظ (يتخطى الجمعة)، بنفس منطق computeRealSlot تمامًا
+function calendarDateForSeqDay(startDateStr, seqD){
+  let cursor = new Date(startDateStr);
+  let count = 0;
+  while(true){
+    if(cursor.getDay() !== 5){
+      count++;
+      if(count === seqD) return new Date(cursor);
+    }
+    cursor.setDate(cursor.getDate() + 1);
+  }
+}
+
+// اسم اليوم الحقيقي بالتقويم (سبت..خميس) لليوم التسلسلي رقم seqD، بناءً على تاريخ بداية الزائر الفعلي
+const JS_WEEKDAY_NAMES = {6:'السبت', 0:'الأحد', 1:'الاثنين', 2:'الثلاثاء', 3:'الأربعاء', 4:'الخميس'};
+function weekdayNameForSeqDay(startDateStr, seqD){
+  const date = calendarDateForSeqDay(startDateStr, seqD);
+  return JS_WEEKDAY_NAMES[date.getDay()] || '';
+}
+
 // اليوم/الأسبوع الحقيقيان محسوبان من التاريخ الفعلي (لا علاقة لهم بتصفح الزائر)
 function computeRealSlot(state){
   const plan = getMemPlan(state);
@@ -668,7 +688,7 @@ function renderMemDashboard(){
   document.getElementById('weekNextBtn').disabled = viewedWeek >= plan.totalWeeks;
   document.getElementById('weekJumpInput').value = '';
   document.getElementById('weekJumpInput').placeholder = ar(viewedWeek);
-  renderDayStrip(plan, real);
+  renderDayStrip(plan, real, memState);
   renderDayDetailAndTasks(plan, real, completed);
 
   const ctaEl = document.getElementById('memAddTrackLink');
@@ -677,8 +697,7 @@ function renderMemDashboard(){
     '<button type="button" class="btn btn-secondary" onclick="chooseTrack(\'review\')">الانتقال إلى جداول المراجعة</button>';
 }
 
-function renderDayStrip(plan, real){
-  const namesByWd = {1:'السبت', 2:'الأحد', 3:'الاثنين', 4:'الثلاثاء', 5:'الأربعاء', 6:'الخميس'};
+function renderDayStrip(plan, real, state){
   const daysOfWeek = plan._daysByWeek[viewedWeek] || [];
   let html = '';
   daysOfWeek.forEach(d=>{
@@ -688,7 +707,7 @@ function renderDayStrip(plan, real){
     if(d.new) badges.push('<span class="badge-circle b-new">ح</span>');
     if(d.near || d.cum) badges.push('<span class="badge-circle b-review">م</span>');
     html += `<div class="day-chip ${isToday ? 'today' : ''} ${isViewed ? 'viewed' : ''}" onclick="selectDaySlot(${d.d})">
-      <div class="day-chip-name">${namesByWd[d.wd] || ''}</div>
+      <div class="day-chip-name">${weekdayNameForSeqDay(state.startDate, d.d)}</div>
       <div class="day-chip-badges">${badges.join('')}</div>
       ${isToday ? '<span class="day-chip-today-lbl">اليوم</span>' : ''}
     </div>`;
