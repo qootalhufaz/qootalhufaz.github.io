@@ -4,9 +4,380 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>تحسين الذاكرة | قوت الحفاظ</title>
+<meta name="description" content="تعرّف على الأساس العلمي لترسيخ الحفظ، وجرّب تمرين الاسترجاع الفعّال ببيانات حقيقية من القرآن، واكتشف أنسب طريقة لك لتثبيت ما حفظت.">
+<link rel="canonical" href="https://qootalhufaz.github.io/memory-boost.html">
+<meta name="theme-color" content="#0f2e21">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="قوت الحفاظ">
+<meta property="og:locale" content="ar_AR">
+<meta property="og:url" content="https://qootalhufaz.github.io/memory-boost.html">
+<meta property="og:title" content="تحسين الذاكرة | قوت الحفاظ">
+<meta property="og:description" content="الأساس العلمي لترسيخ الحفظ، وتمرين استرجاع فعّال ببيانات حقيقية من القرآن.">
+<meta property="og:image" content="https://qootalhufaz.github.io/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="شعار قوت الحفاظ">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="تحسين الذاكرة | قوت الحفاظ">
+<meta name="twitter:description" content="الأساس العلمي لترسيخ الحفظ، وتمرين استرجاع فعّال ببيانات حقيقية من القرآن.">
+<meta name="twitter:image" content="https://qootalhufaz.github.io/og-image.jpg">
+
+<!-- Favicons -->
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="icon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="icon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<style>
+  /* ===== أنماط خاصة بصفحة تحسين الذاكرة فقط (غير موجودة بـ style.css المشترك) ===== */
+  .quran-text{ font-family:'Amiri', serif; }
+
+  .mb-page-head{ padding:26px 24px; }
+  .mb-page-head h1{ font-size:1.55rem; margin-bottom:6px; }
+  .mb-page-head p{ font-size:.92rem; }
+
+  .mb-main{
+    max-width:760px;
+    margin:0 auto;
+    padding:36px 20px 80px;
+  }
+  /* تجاوز الـpadding الافتراضي لوسم section من style.css المشترك (56px) */
+  .mb-main section{ padding:0; max-width:none; margin:0; }
+
+  /* ===== المقدمة + دعوة الحفظ الأولي (شريط مضغوط جنب بعض) ===== */
+  .mb-intro-row{
+    display:flex;
+    align-items:center;
+    gap:18px;
+    flex-wrap:wrap;
+  }
+  .mb-intro-text{
+    flex:2;
+    min-width:220px;
+    color:var(--ink-soft);
+    font-size:.94rem;
+    margin:0;
+  }
+  .mb-intro-card{
+    flex:1;
+    min-width:180px;
+    background:var(--green-tint);
+    border-radius:10px;
+    padding:14px 16px;
+    text-align:center;
+  }
+  .mb-intro-card p{
+    font-size:.86rem;
+    color:var(--navy-deep);
+    font-weight:500;
+    margin:0 0 8px;
+  }
+  .btn-sm{ padding:6px 16px; font-size:.85rem; }
+
+  .mb-block{ margin-top:36px; }
+  .mb-heading-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding-bottom:12px;
+    border-bottom:2px solid var(--line);
+    margin-bottom:6px;
+  }
+  .mb-num{
+    flex:none;
+    width:28px; height:28px;
+    border-radius:50%;
+    background:var(--navy-deep);
+    color:var(--gold-light);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Amiri', serif; font-weight:700; font-size:.9rem;
+  }
+  .mb-heading-flat{ font-size:1.3rem; color:var(--navy-deep); margin:0; }
+  .mb-subtext{
+    color:var(--ink-soft);
+    margin:10px 0 4px;
+    font-size:.94rem;
+  }
+
+  /* ===== نظام الشرائح (chips) المشترك للأساس العلمي والتشخيص ===== */
+  .chip-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:16px;
+  }
+  .chip{
+    font-family:'Tajawal', sans-serif;
+    font-size:.85rem;
+    padding:9px 16px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:var(--panel);
+    color:var(--ink-soft);
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .chip:hover{ border-color:var(--gold); color:var(--navy-deep); }
+  .chip.active{
+    background:var(--navy-deep);
+    border-color:var(--navy-deep);
+    color:var(--gold-light);
+    font-weight:700;
+  }
+  .chip-panel{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:18px 20px;
+    margin-top:12px;
+    font-size:.94rem;
+    color:var(--ink-soft);
+    line-height:1.9;
+  }
+  .chip-panel p{ margin:0 0 10px; }
+  .chip-panel p:last-child{ margin-bottom:0; }
+  .chip-panel .diag-answer{ color:var(--navy-deep); margin-bottom:10px; }
+  .chip-panel .diag-link{
+    display:inline-block;
+    font-size:.86rem;
+    font-weight:700;
+    color:var(--navy);
+    border-bottom:1px solid var(--gold);
+  }
+
+  /* ===== مراحل الترسيخ (رواق + خط تسلسل رفيع أ→هـ) ===== */
+  .stage-row{
+    display:flex;
+    gap:14px;
+    align-items:stretch;
+  }
+  .stage-rail{
+    flex:none;
+    width:36px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  .stage-rail .stage-line{
+    flex:1;
+    width:2px;
+    background:var(--line);
+    margin-top:4px;
+    min-height:14px;
+  }
+  .stage-badge{
+    flex:none;
+    width:36px; height:36px;
+    background:var(--navy-deep);
+    color:var(--gold-light);
+    border-radius:8px;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Amiri',serif; font-weight:700; font-size:1.05rem;
+  }
+  .stage-card{
+    flex:1;
+    min-width:0;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:12px;
+    margin-bottom:14px;
+    overflow:hidden;
+  }
+  .stage-body{ padding:20px 22px 24px; }
+  .stage-head{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:18px 22px;
+  }
+  .stage-head.static{ padding-bottom:0; }
+  .stage-toggle{
+    width:100%;
+    background:none;
+    border:none;
+    cursor:pointer;
+    text-align:right;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:18px 22px;
+    font-family:'Tajawal', sans-serif;
+  }
+  .stage-head h3, .stage-toggle h3{ font-size:1.1rem; color:var(--navy-deep); flex:1; margin:0; }
+  .stage-card .acc-chevron{ flex:none; color:var(--ink-soft); transition:transform .2s ease; font-size:.85rem; }
+  .stage-card.open .acc-chevron{ transform:rotate(180deg); }
+  .stage-card .stage-body{ display:none; }
+  .stage-card.open .stage-body, .stage-card.always-open .stage-body{ display:block; }
+  .stage-card.always-open .stage-body{ padding-top:0; }
+  .stage-card p{ color:var(--ink-soft); font-size:.95rem; margin-bottom:10px; }
+  .stage-card p:last-child{ margin-bottom:0; }
+  .stage-card ol.stage-steps, .stage-card ul.stage-list{
+    margin:0 0 16px;
+    padding-inline-start:20px;
+    color:var(--ink-soft);
+    font-size:.93rem;
+  }
+  .stage-card ol.stage-steps li, .stage-card ul.stage-list li{ margin-bottom:6px; }
+  .stage-card ul.stage-list li b{ color:var(--ink); font-weight:700; }
+  .stage-card a{ color:var(--navy); font-weight:700; border-bottom:1px solid var(--gold); }
+
+  /* ===== صندوق الاختبار التفاعلي ===== */
+  .test-box{
+    background:var(--green-tint);
+    border:1px dashed var(--gold);
+    border-radius:12px;
+    padding:22px;
+    margin:18px 0;
+  }
+  .test-row{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:6px; }
+  .test-row label{ font-weight:700; color:var(--navy-deep); font-size:.92rem; }
+  .test-row select{
+    font-family:'Tajawal', sans-serif;
+    font-size:.98rem;
+    padding:10px 14px;
+    border:2px solid var(--line);
+    border-radius:10px;
+    background:var(--panel);
+    color:var(--ink);
+    min-width:200px;
+  }
+  .test-row select:focus{ outline:none; border-color:var(--gold); }
+  .test-verse-area{ margin-top:16px; }
+  .test-empty{
+    text-align:center;
+    padding:22px 10px;
+    color:var(--ink-soft);
+    font-size:.92rem;
+  }
+  .test-ref{ font-size:.85rem; font-weight:700; color:var(--navy); margin-bottom:10px; }
+  .test-verse-text{
+    font-size:1.4rem;
+    color:var(--ink);
+    line-height:2.1;
+    background:var(--panel);
+    border-radius:10px;
+    padding:18px 20px;
+  }
+  .test-verse-hidden{
+    background:var(--panel);
+    border-radius:10px;
+    padding:26px 20px;
+    text-align:center;
+    color:var(--ink-soft);
+    font-size:.92rem;
+  }
+  .test-hidden-icon{ font-size:1.6rem; margin-bottom:8px; }
+  .test-btn-row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:16px; }
+  .test-btn-row .btn{ cursor:pointer; border:none; font-family:'Tajawal', sans-serif; }
+
+  .mb-note{
+    color:var(--ink-soft);
+    font-size:.86rem;
+    font-style:italic;
+    margin:6px 0 18px;
+  }
+  .streak-badge{
+    font-size:.85rem;
+    font-weight:700;
+    color:var(--navy-deep);
+    background:var(--gold-light);
+    border-radius:999px;
+    padding:5px 12px;
+    margin-inline-start:auto;
+  }
+  .test-given-ref{ font-size:.85rem; font-weight:700; color:var(--navy); margin-bottom:10px; }
+  .test-given-text{
+    font-size:1.3rem;
+    color:var(--ink);
+    line-height:2;
+    background:var(--panel);
+    border-radius:10px;
+    padding:16px 18px;
+    margin-bottom:16px;
+  }
+  .test-next-prompt{
+    text-align:center;
+    color:var(--ink-soft);
+    font-size:.92rem;
+    font-weight:700;
+    margin-bottom:10px;
+  }
+  .test-hint-text{
+    text-align:center;
+    font-size:1.1rem;
+    color:var(--navy-deep);
+    background:var(--panel);
+    border-radius:10px;
+    padding:12px;
+    margin-bottom:10px;
+  }
+  .rating-row{ display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
+  .rating-btn{
+    flex:1;
+    min-width:120px;
+    font-family:'Tajawal', sans-serif;
+    font-size:.85rem;
+    padding:9px 10px;
+    border-radius:8px;
+    border:1px solid var(--line);
+    background:var(--panel);
+    color:var(--ink-soft);
+    cursor:pointer;
+  }
+  .rating-btn:hover{ border-color:var(--gold); color:var(--navy-deep); }
+  .rating-btn.chosen{
+    background:var(--navy-deep);
+    border-color:var(--navy-deep);
+    color:var(--gold-light);
+    font-weight:700;
+  }
+  .rating-feedback{
+    text-align:center;
+    color:var(--navy-deep);
+    font-size:.9rem;
+    font-weight:500;
+    margin-top:10px;
+  }
+
+  /* ===== الاستمرارية بعد الترسيخ ===== */
+  .mb-checklist{ list-style:none; margin-top:18px; }
+  .mb-checklist li{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    padding:10px 0;
+    border-bottom:1px dashed var(--line);
+    color:var(--ink-soft);
+    font-size:.96rem;
+  }
+  .mb-checklist li:last-child{ border-bottom:none; }
+  .mb-checklist li::before{
+    content:'✓';
+    flex:none;
+    color:var(--gold);
+    font-weight:700;
+  }
+  .mb-closing{ margin-top:16px; color:var(--navy-deep); font-weight:500; }
+
+  /* ===== الدعوة الختامية (بنفس نمط cta-box المستخدم بصفحة الجداول) ===== */
+  .mb-cta{
+    margin-top:40px;
+    padding-top:28px;
+    border-top:1px solid var(--line);
+    text-align:center;
+  }
+  .mb-cta h2{ font-size:1.35rem; margin-bottom:8px; }
+  .mb-cta p{ color:var(--ink-soft); font-size:.96rem; margin-bottom:20px; max-width:480px; margin-inline:auto; }
+  .mb-cta .btn-row{ justify-content:center; }
+</style>
 </head>
 <body>
 
@@ -28,17 +399,400 @@
   </nav>
 </header>
 
-<section class="coming-soon">
-  <div class="cs-icon">🧠</div>
+<div class="page-head mb-page-head">
   <h1>تحسين الذاكرة</h1>
-  <p>هذا القسم قيد الإعداد حاليًا، وسيكون متاحًا قريبًا بإذن الله.</p>
-  <a href="index.html" class="btn btn-primary">العودة للرئيسية</a>
-</section>
+  <p>تعرّف على أسس ترسيخ الحفظ، وجرّب تمرين الاسترجاع الفعّال ببيانات حقيقية من القرآن.</p>
+</div>
+
+<main class="mb-main">
+
+  <!-- ١+٢: مقدمة والحفظ الأولي (شريط مضغوط) -->
+  <section class="mb-intro-row">
+    <p class="mb-intro-text">وبعد أن تحفظ الآية فهمًا واستماعًا وتكرارًا، يبقى الحفظ بحاجة إلى قوته اليومي — وهذا ما نتعلمه هنا.</p>
+    <div class="mb-intro-card">
+      <p>لسه بتحفظ من الصفر؟</p>
+      <a href="schedules.html" class="btn btn-secondary btn-sm">صفحة الجداول</a>
+    </div>
+  </section>
+
+  <!-- ١: تمرين الاسترجاع الفعّال (صندوق الاختبار — مرفوع لأعلى الصفحة) -->
+  <section class="mb-block" id="retrieval-practice">
+    <div class="mb-heading-row"><span class="mb-num">١</span><h2 class="mb-heading-flat">جرّب الآن: الاسترجاع الفعّال</h2></div>
+    <p class="mb-subtext">هذه الآية أمامك — والمطلوب منك ليس حفظها هي، بل تذكّر <b style="color:var(--ink); font-weight:700;">الآية اللي بعدها</b>. هذا يختبر أدق نقطة غالبًا ما تضعف عندها: نقطة الوصل بين الآيات.</p>
+    <p class="mb-note">تذكّر أن هذه الأداة تعينك على المراجعة الذاتية، لكنها لا تغني عن عرض حفظك على معلّم أو شيخ يكشف لك أخطاء التلاوة والتشابه التي قد لا تنتبه لها بنفسك.</p>
+
+    <div class="test-box" id="testBox">
+      <div class="test-row">
+        <label for="testSurahSelect">اختر السورة:</label>
+        <select id="testSurahSelect">
+          <option value="">اختر سورة...</option>
+        </select>
+        <span class="streak-badge" id="streakBadge" style="display:none"></span>
+      </div>
+      <div class="test-verse-area" id="testVerseArea">
+        <div class="test-empty">اختر سورة من الأعلى، وستظهر لك آية عشوائية منها، وعليك تذكّر الآية التي تليها.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ٢: الأساس العلمي للترسيخ (شرائح) -->
+  <section class="mb-block">
+    <div class="mb-heading-row"><span class="mb-num">٢</span><h2 class="mb-heading-flat">الأساس العلمي للترسيخ</h2></div>
+
+    <div class="chip-row" id="basisChips">
+      <button class="chip" data-key="b1">الذاكرة المؤقتة والدائمة</button>
+      <button class="chip" data-key="b2">التعلّم متعدد الحواس</button>
+      <button class="chip" data-key="b3">منحنى النسيان</button>
+      <button class="chip" data-key="b4">الذاكرة البصرية والتلوين</button>
+      <button class="chip" data-key="b5">وهم الإتقان</button>
+      <button class="chip" data-key="b6">الصعوبات المرغوبة</button>
+    </div>
+    <div class="chip-panel" id="basisPanel"></div>
+  </section>
+
+  <!-- ٤: عنصر تفاعلي تشخيصي (شرائح) -->
+  <section class="mb-block">
+    <div class="mb-heading-row"><span class="mb-num">٣</span><h2 class="mb-heading-flat">وين بدك تبدأ؟</h2></div>
+    <p class="mb-subtext">ما أكثر شيء يصعّب عليك تثبيت الآية بعد حفظها؟</p>
+
+    <div class="chip-row" id="diagChips">
+      <button class="chip" data-key="d1">أنسى بسرعة</button>
+      <button class="chip" data-key="d2">أخلط بين الآيات</button>
+      <button class="chip" data-key="d3">صعوبة الاسترجاع</button>
+      <button class="chip" data-key="d4">المراجعة مملة</button>
+      <button class="chip" data-key="d5">شيء آخر</button>
+    </div>
+    <div class="chip-panel" id="diagPanel"></div>
+  </section>
+
+  <!-- ٤: لا تنتقل قبل الإتقان -->
+  <section class="mb-block">
+    <div class="mb-heading-row"><span class="mb-num">٤</span><h2 class="mb-heading-flat">لا تنتقل قبل الإتقان</h2></div>
+    <p class="mb-subtext">من أهم القواعد التي يتّفق عليها الحفّاظ المتمرّسون: لا تبدأ صفحة جديدة وصفحتك السابقة لم تستقر بعد. فالانتقال المبكر يراكم ضعفًا خفيًا يصعب تلافيه لاحقًا، ويتحوّل الحفظ الجديد إلى عبء إضافي على حفظ لم يثبت أصلًا. علامة الاستعداد الحقيقية للانتقال: أن تسترجع الصفحة السابقة كاملة دون تلعثم أو حاجة للنظر في المصحف، لا مجرد الشعور العام بأنها "أصبحت مألوفة".</p>
+  </section>
+
+  <!-- ٥: مراحل الترسيخ (رواق + خط تسلسل) -->
+  <section class="mb-block">
+    <div class="mb-heading-row"><span class="mb-num">٥</span><h2 class="mb-heading-flat">مراحل الترسيخ</h2></div>
+
+    <div class="stage-row">
+      <div class="stage-rail"><span class="stage-badge">أ</span><span class="stage-line"></span></div>
+      <div class="stage-card always-open" id="stage-retrieval">
+        <div class="stage-head static"><h3>الاسترجاع الفعّال</h3></div>
+        <div class="stage-body">
+          <p>من بين كل وسائل الترسيخ، يبقى الاسترجاع الفعّال هو الأقوى أثرًا: أن تحاول استحضار الآية من ذاكرتك قبل أن تنظر إليها.</p>
+          <p><b style="color:var(--ink); font-weight:700;">جرّب الآن:</b></p>
+          <ol class="stage-steps">
+            <li>اقرأ الآية جيدًا.</li>
+            <li>أغلق المصحف أو اخفِ النص.</li>
+            <li>حاول تسميعها أو كتابتها من ذاكرتك.</li>
+            <li>قارن ما استرجعته بالأصل، وصحّح ما فاتك.</li>
+          </ol>
+          <p>كل محاولة استرجاع — ولو أخطأت فيها — ترسّخ الآية في ذاكرتك أعمق مما تفعله عشر قراءات.</p>
+          <p>وإن شعرت أحيانًا أنك تحفظ الآية جيدًا في خلوتك، لكنك "تتجمّد" وتنساها أمام معلّمك وقت التسميع، فاعلم أن هذا لا يتعلّق بضعف حفظك غالبًا، بل بأثر التوتر على الاسترجاع؛ فالتوتر يُصعّب الوصول لما هو مخزّن فعلًا في ذاكرتك دون أن يمحوه. خذ نفسًا عميقًا قبل البدء، وامنح نفسك لحظة هدوء قبل أن تسترجع.</p>
+          <p><a href="#retrieval-practice">↑ جرّب تمرين الاسترجاع الفعّال أعلى الصفحة</a></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="stage-row">
+      <div class="stage-rail"><span class="stage-badge">ب</span><span class="stage-line"></span></div>
+      <div class="stage-card" id="multisensory">
+        <button class="stage-toggle"><h3>التعلّم متعدد الحواس</h3><span class="acc-chevron">▾</span></button>
+        <div class="stage-body">
+          <p>لا تكتفِ بوسيلة واحدة في المراجعة:</p>
+          <ul class="stage-list">
+            <li><b>السمع:</b> استمع للآية بصوت مرتفع أو همس متكرر.</li>
+            <li><b>النطق:</b> سمّعها بصوتك أنت، ولو كنت وحدك.</li>
+            <li><b>البصر:</b> انظر في المصحف ثم أغمض عينيك وحاول تخيّل رسمها.</li>
+            <li><b>الحركة:</b> أشر بيدك أو تحرّك أثناء المراجعة؛ فالحركة تشدّ الحفظ إلى الجسد لا العقل وحده.</li>
+          </ul>
+          <p>كل حاسة تشارك تضيف خيطًا جديدًا يثبّت به الحفظ.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="stage-row">
+      <div class="stage-rail"><span class="stage-badge">ج</span><span class="stage-line"></span></div>
+      <div class="stage-card" id="spaced-repetition">
+        <button class="stage-toggle"><h3>التكرار المتباعد</h3><span class="acc-chevron">▾</span></button>
+        <div class="stage-body">
+          <p>التوقيت الصحيح للمراجعة أهمّ من كثرتها العشوائية. راجع بعد ساعة، ثم بعد يوم، ثم بعد ثلاثة أيام، ثم بعد أسبوع.</p>
+          <p>لجداول مراجعة جاهزة ومنظّمة تلقائيًا، انتقل إلى <a href="schedules.html">صفحة الجداول</a>.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="stage-row">
+      <div class="stage-rail"><span class="stage-badge">د</span><span class="stage-line"></span></div>
+      <div class="stage-card">
+        <button class="stage-toggle"><h3>دور النوم في الترسيخ</h3><span class="acc-chevron">▾</span></button>
+        <div class="stage-body">
+          <p>النوم ليس توقفًا عن العمل، بل مرحلة نشطة يعيد فيها الدماغ ترتيب ما حفظته وتثبيته. حاول أن تراجع أهمّ آياتك قبل النوم بساعة تقريبًا، واحرص على قسط كافٍ منه.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="stage-row">
+      <div class="stage-rail"><span class="stage-badge">هـ</span></div>
+      <div class="stage-card">
+        <button class="stage-toggle"><h3>الربط الذهني والمتشابهات</h3><span class="acc-chevron">▾</span></button>
+        <div class="stage-body">
+          <p>ربط الآية بمعناها، أو بآية تشبهها، يقلل الخلط ويعمّق الثبات. وللتعامل مع المتشابهات بشكل منظّم، تصفّح <a href="mutashabihat.html">صفحة المتشابهات</a> في الموقع.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ٦: الاستمرارية بعد الترسيخ -->
+  <section class="mb-block">
+    <div class="mb-heading-row"><span class="mb-num">٦</span><h2 class="mb-heading-flat">الاستمرارية بعد الترسيخ</h2></div>
+    <p class="mb-subtext">حتى بعد أن يثبت الحفظ، يبقى محتاجًا إلى من يحميه:</p>
+    <ul class="mb-checklist">
+      <li>لا تترك فجوة طويلة بلا مراجعة.</li>
+      <li>في الأيام الضعيفة، اكتفِ بمراجعة قصيرة مركزة بدل الانقطاع الكامل.</li>
+      <li>علامة الترسيخ الحقيقي: أن تسترجع الآية بعد أسبوع أو أكثر دون مراجعة مباشرة.</li>
+    </ul>
+    <p class="mb-closing">بعد الختم، لا يكون الهدف الحفظ وحده، بل حراسة ما حُفظ والثبات عليه.</p>
+  </section>
+
+  <!-- ٧: الدعوة الختامية -->
+  <section class="mb-cta">
+    <h2>جاهز ترسّخ حفظك بقوة؟</h2>
+    <p>انتقل الآن إلى جداول المراجعة المنظّمة في قوت الحفاظ، وابدأ بتطبيق ما تعلمته.</p>
+    <div class="btn-row">
+      <a href="schedules.html" class="btn btn-primary">جداول المراجعة</a>
+      <a href="#retrieval-practice" class="btn btn-secondary">جرّب تمرين الاسترجاع الفعّال</a>
+    </div>
+  </section>
+
+</main>
 
 <footer>
   <span class="brand">قوت الحفاظ</span>
   نسأل الله أن ينفع به كل طالب حفظ لكتابه الكريم
 </footer>
+<script>
+  // ================================================================
+  // نظام الشرائح (chips) — الأساس العلمي والتشخيص
+  // ================================================================
+  function setupChipGroup(rowId, panelId, dataMap, defaultKey){
+    const row = document.getElementById(rowId);
+    const panel = document.getElementById(panelId);
+    function render(key){
+      panel.innerHTML = dataMap[key];
+      row.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c.dataset.key === key));
+    }
+    row.querySelectorAll('.chip').forEach(chip => {
+      chip.addEventListener('click', () => render(chip.dataset.key));
+    });
+    render(defaultKey);
+  }
+
+  const basisData = {
+    b1: '<p>حين نقرأ الآية أول مرة، تستقر في ذاكرتنا المؤقتة — مكانٌ ضيّق سرعان ما يُفرَغ إن لم يُثبَّت ما فيه. أما الذاكرة الدائمة فلا تُبنى بالقراءة وحدها، بل بالتكرار والاسترجاع حتى تنتقل إليها الآية وتستقر فيها طويلًا. وهذا الانتقال هو جوهر الترسيخ.</p>',
+    b2: '<p>هل تعلم أن لعينك ذاكرة؟ نعم، ولأذنك ويدك ذاكرة أيضًا. فذاكرتك البصرية والسمعية والحركية كجداول صغيرة، كل واحدة تصبّ في نهر الحفظ. وكلما ازدادت الجداول، ازداد تدفق النهر، وترسّخ الحفظ أعمق.</p>',
+    b3: '<p>لكل حافظ فترات إقبال وفترات فتور؛ أيام يمتلئ فيها الورد بسهولة، وأيام يطغى عليها انشغال يقطع خيط المراجعة. وفي هذه الفجوات بالذات يبدأ منحنى النسيان عمله الصامت، فتتفلّت الآية شيئًا فشيئًا كلما طال أمد الغياب عنها.</p>',
+    b4: '<p>كثير من الحفّاظ يلوّنون مواضع التشابه في المصحف ليسهل تمييزها، وهذا استخدام عملي لمبدأ علمي يُعرف بـ"الترميز المزدوج": حين تضيف طبقة بصرية (اللون) فوق الطبقة اللفظية (الصوت والنطق)، تصنع مسارًا إضافيًا في الذاكرة يسند المسار الأول عند التذكر. ولا يقتصر التلوين على المتشابهات وحدها؛ جرّب تخصيص لون ثابت لكل فاصلة متكررة، أو لون لكل موضوع رئيسي في السورة، بشرط الثبات على نفس اللون لنفس الغرض في كل مرة — فالتناسق هو ما يجعل اللون مفتاحًا للذاكرة لا مجرد زخرفة.</p>',
+    b5: '<p>القراءة المتكررة تخدعك أحيانًا: فحين تنظر في الآية وتتعرّف عليها بسهولة، تظن أنك أتقنتها، مع أن ما حدث هو "تعرّف" لا "استرجاع" — والفرق بينهما كالفرق بين أن تتعرّف على وجه في الشارع وأن تتذكّر اسمه من غير أن تراه. الاختبار الحقيقي لإتقانك هو أن تُغلق المصحف وتسترجع الآية من الصفر، لا أن تعيد قراءتها.</p>',
+    b6: '<p>قد يبدو غريبًا، لكن كلما كان استرجاع الآية أصعب قليلًا — دون أن يصل الأمر إلى الإحباط — كان أثرها في ذاكرتك أعمق. هذا ما يسميه الباحثون "الصعوبات المرغوبة": الجهد الذي تبذله وأنت تحاول تذكّر الآية بنفسك هو ما يبني الرابط القوي، بعكس القراءة السهلة المريحة التي لا تترك أثرًا يُذكر. لهذا فإن إخفاء الآية ومحاولة استرجاعها، رغم صعوبته الظاهرة، هو أقصر طريق للترسيخ.</p>'
+  };
+  setupChipGroup('basisChips', 'basisPanel', basisData, 'b1');
+
+  const diagData = {
+    d1: '<p class="diag-answer">هذا منحنى النسيان يعمل بلا مقاومة. أقوى علاج له المراجعة بالتوقيت الصحيح.</p><a class="diag-link" href="#spaced-repetition">التكرار المتباعد وجداول المراجعة ←</a>',
+    d2: '<p class="diag-answer">الحل هنا ليس بالتكرار، بل بالربط الذهني الدقيق.</p><a class="diag-link" href="mutashabihat.html">صفحة المتشابهات ←</a>',
+    d3: '<p class="diag-answer">مشكلتك ليست في الحفظ، بل في التدرّب على الاسترجاع نفسه.</p><a class="diag-link" href="#retrieval-practice">تمرين الاسترجاع الفعّال ←</a>',
+    d4: '<p class="diag-answer">جرّب تفعيل أكثر من حاسة أثناء المراجعة؛ التنويع يكسر الملل ويقوّي الترسيخ.</p><a class="diag-link" href="#multisensory">التعلّم متعدد الحواس ←</a>',
+    d5: '<p class="diag-answer">مهما كانت نقطة ضعفك، جداول المراجعة المنظّمة نقطة انطلاق جيدة دائمًا.</p><a class="diag-link" href="schedules.html">صفحة الجداول ←</a>'
+  };
+  setupChipGroup('diagChips', 'diagPanel', diagData, 'd1');
+
+  // ================================================================
+  // أكورديون: مراحل الترسيخ ب-هـ (المرحلة "أ" مفتوحة دائمًا)
+  // ================================================================
+  document.querySelectorAll('.stage-card .stage-toggle').forEach(toggle => {
+    toggle.addEventListener('click', () => {
+      toggle.closest('.stage-card').classList.toggle('open');
+    });
+  });
+
+  // ================================================================
+  // صندوق الاختبار التفاعلي: تذكّر الآية التالية (استرجاع فعّال حقيقي)
+  // ================================================================
+  let mbQuranData = [];
+  let mbSurahNames = {};
+
+  const testSurahSelect = document.getElementById('testSurahSelect');
+  const testVerseArea = document.getElementById('testVerseArea');
+  const streakBadge = document.getElementById('streakBadge');
+  let mbCurrentSurah = '';
+  let mbGivenVerse = null;
+  let mbTargetVerse = null;
+
+  const MB_LAST_SURAH_KEY = 'mbLastSurah';
+  const MB_STREAK_KEY = 'mbStreakData';
+
+  async function loadMbData(){
+    try{
+      const [quranRes, surahsRes] = await Promise.all([
+        fetch('quran.json'),
+        fetch('surahs.json')
+      ]);
+      mbQuranData = await quranRes.json();
+      const surahsData = await surahsRes.json();
+      surahsData
+        .slice()
+        .sort((a, b) => a['الترتيب'] - b['الترتيب'])
+        .forEach(s => {
+          mbSurahNames[s['الترتيب']] = s['الاسم'];
+          const opt = document.createElement('option');
+          opt.value = s['الترتيب'];
+          opt.textContent = s['الاسم'];
+          testSurahSelect.appendChild(opt);
+        });
+
+      renderStreakBadge();
+
+      // استرجاع آخر سورة اختارها الزائر تلقائيًا
+      const lastSurah = localStorage.getItem(MB_LAST_SURAH_KEY);
+      if(lastSurah && mbSurahNames[lastSurah]){
+        testSurahSelect.value = lastSurah;
+        mbCurrentSurah = lastSurah;
+        pickRandomPair();
+      }
+    }catch(err){
+      testVerseArea.innerHTML = '<div class="test-empty">تعذّر تحميل بيانات القرآن. تأكد أنك تفتح الصفحة عبر Live Server وليس مباشرة كملف.</div>';
+      console.error(err);
+    }
+  }
+  loadMbData();
+
+  testSurahSelect.addEventListener('change', () => {
+    mbCurrentSurah = testSurahSelect.value;
+    if(!mbCurrentSurah){
+      testVerseArea.innerHTML = '<div class="test-empty">اختر سورة من الأعلى، وستظهر لك آية عشوائية منها، وعليك تذكّر الآية التي تليها.</div>';
+      return;
+    }
+    localStorage.setItem(MB_LAST_SURAH_KEY, mbCurrentSurah);
+    recordDailyUse();
+    pickRandomPair();
+  });
+
+  function pickRandomPair(){
+    const verses = mbQuranData.filter(a => String(a.sura) === String(mbCurrentSurah));
+    // نستبعد آخر آية بالسورة لأنه لازم يكون في "آية بعدها" لاختبارها
+    if(verses.length < 2){
+      testVerseArea.innerHTML = '<div class="test-empty">هذه السورة قصيرة جدًا لهذا التمرين.</div>';
+      return;
+    }
+    const i = Math.floor(Math.random() * (verses.length - 1));
+    mbGivenVerse = verses[i];
+    mbTargetVerse = verses[i + 1];
+    renderTestPair();
+  }
+
+  function renderTestPair(){
+    const surahName = mbSurahNames[mbCurrentSurah] || ('سورة رقم ' + mbCurrentSurah);
+
+    testVerseArea.innerHTML = `
+      <div class="test-given-ref">سورة ${surahName}، آية ${toArabicDigitsMb(mbGivenVerse.aya)}</div>
+      <div class="test-given-text quran-text">${mbGivenVerse.text}</div>
+      <div class="test-next-prompt">↓ حاول تتذكّر الآية اللي بعدها ↓</div>
+      <div id="testHintArea"></div>
+      <div id="testTargetArea"></div>
+      <div class="test-btn-row" id="testActionRow">
+        <button id="hintBtn" class="btn btn-secondary">تلميح</button>
+        <button id="revealBtn" class="btn btn-primary">أظهر الآية التالية</button>
+        <button id="newPairBtn" class="btn btn-secondary">آية جديدة</button>
+      </div>
+    `;
+
+    document.getElementById('hintBtn').addEventListener('click', showHint);
+    document.getElementById('revealBtn').addEventListener('click', revealTarget);
+    document.getElementById('newPairBtn').addEventListener('click', pickRandomPair);
+  }
+
+  function showHint(){
+    const words = mbTargetVerse.text.trim().split(/\s+/);
+    const hintWords = words.slice(0, Math.min(2, words.length)).join(' ');
+    document.getElementById('testHintArea').innerHTML =
+      `<div class="test-hint-text quran-text">${hintWords} ...</div>`;
+    document.getElementById('hintBtn').disabled = true;
+  }
+
+  function revealTarget(){
+    document.getElementById('testTargetArea').innerHTML = `
+      <div class="test-verse-text quran-text">${mbTargetVerse.text}</div>
+      <div class="rating-row" id="ratingRow">
+        <button class="rating-btn" data-r="full">تذكرتها كاملة</button>
+        <button class="rating-btn" data-r="partial">جزء منها</button>
+        <button class="rating-btn" data-r="none">لم أتذكرها</button>
+      </div>
+      <div class="rating-feedback" id="ratingFeedback"></div>
+    `;
+    document.getElementById('hintBtn').disabled = true;
+    document.getElementById('revealBtn').disabled = true;
+
+    document.querySelectorAll('#ratingRow .rating-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#ratingRow .rating-btn').forEach(b => b.classList.remove('chosen'));
+        btn.classList.add('chosen');
+        const messages = {
+          full: 'ممتاز! هذا هو أثر الاسترجاع الفعّال — استمر.',
+          partial: 'لا بأس، هذا جزء طبيعي من الترسيخ. راجع نقطة الوصل هذه بعد قليل.',
+          none: 'ما تذكرتها الآن أفضل من أن تظني أنك تتذكرينها وأنتِ لا تتذكرين — هذا بالضبط ما يقيه "وهم الإتقان".'
+        };
+        document.getElementById('ratingFeedback').textContent = messages[btn.dataset.r] || '';
+      });
+    });
+  }
+
+  function recordDailyUse(){
+    const today = new Date().toISOString().slice(0, 10);
+    let data = { lastUseDate: '', streak: 0 };
+    try{
+      const stored = localStorage.getItem(MB_STREAK_KEY);
+      if(stored) data = JSON.parse(stored);
+    }catch(e){}
+
+    if(data.lastUseDate === today){
+      renderStreakBadge();
+      return; // مُحتسَب أصلًا هالليوم
+    }
+
+    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+    if(data.lastUseDate === yesterday){
+      data.streak = (data.streak || 0) + 1;
+    } else {
+      data.streak = 1;
+    }
+    data.lastUseDate = today;
+
+    try{ localStorage.setItem(MB_STREAK_KEY, JSON.stringify(data)); }catch(e){}
+    renderStreakBadge();
+  }
+
+  function renderStreakBadge(){
+    let data = null;
+    try{
+      const stored = localStorage.getItem(MB_STREAK_KEY);
+      if(stored) data = JSON.parse(stored);
+    }catch(e){}
+
+    if(data && data.streak > 0){
+      streakBadge.style.display = 'inline-block';
+      streakBadge.textContent = `🔥 ${toArabicDigitsMb(data.streak)} ${data.streak === 1 ? 'يوم' : 'أيام'} متتالية`;
+    } else {
+      streakBadge.style.display = 'none';
+    }
+  }
+
+  function toArabicDigitsMb(num){
+    const arabicDigits = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+    return String(num).replace(/[0-9]/g, d => arabicDigits[d]);
+  }
+</script>
 
 <a href="share-experience.html" class="share-fab" title="شاركنا تجربتك">💬</a>
 
