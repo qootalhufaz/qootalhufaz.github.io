@@ -893,11 +893,31 @@ function saveRevOnboarding(){
   showRevDashboard();
 }
 
-// فهرس اليوم الحقيقي الحالي ضمن أسبوع المراجعة: 0..5 (سبت..خميس)، أو 'friday'، أو null (لن يحدث)
-function realRevIndex(){
+// ترتيب أيام الأسبوع الحقيقية (jsDay) لخطة مراجعة زائر معيّن، بدءًا من يوم تسجيله فعليًا (دائري، يتخطى الجمعة).
+// مثال: زائر سجّل يوم الأربعاء ⇐ [أربعاء, خميس, سبت, أحد, اثنين, ثلاثاء] بدل الترتيب الثابت [سبت..خميس].
+// لو سجّل يوم الجمعة نفسه (يوم راحة)، تبدأ خطته من السبت التالي.
+function reviewJsDayOrder(startDateStr){
+  let d = new Date(startDateStr).getDay();
+  if(d === 5) d = 6;
+  const order = [];
+  let cursor = d;
+  while(order.length < 6){
+    if(cursor !== 5) order.push(cursor);
+    cursor = (cursor + 1) % 7;
+  }
+  return order;
+}
+
+// نفس الترتيب أعلاه لكن كعناصر {jsDay, name} جاهزة للعرض (تُستخدم بشريط الأيام)
+function reviewWeekdayOrder(startDateStr){
+  return reviewJsDayOrder(startDateStr).map(jsDay => REVIEW_WEEKDAYS.find(w => w.jsDay === jsDay));
+}
+
+// فهرس اليوم الحقيقي الحالي ضمن خطة مراجعة هذا الزائر تحديدًا: 0..5، أو 'friday'
+function realRevIndex(state){
   const jsDay = new Date(todayStr()).getDay();
   if(jsDay === 5) return 'friday';
-  return REVIEW_WEEKDAYS.findIndex(d => d.jsDay === jsDay);
+  return reviewJsDayOrder(state.startDate).indexOf(jsDay);
 }
 
 // حساب مدى المراجعة (بالأرباع) لفهرس يوم معيّن: تقسيم متساوٍ لإجمالي أرباع محفوظه على 6 أيام (سبت..خميس)
@@ -972,7 +992,7 @@ function showRevDashboard(){
   showView('rev-dashboard');
   const switchBar = document.getElementById('trackSwitchRev');
   switchBar.style.display = memState ? 'block' : 'none';
-  viewedRevIndex = realRevIndex(); // كل دخول جديد للوحة يبدأ من اليوم الحقيقي
+  viewedRevIndex = realRevIndex(revState); // كل دخول جديد للوحة يبدأ من اليوم الحقيقي
   renderRevDashboard();
 }
 
@@ -982,7 +1002,7 @@ function selectRevIndex(index){
 }
 
 function backToRealRevToday(){
-  viewedRevIndex = realRevIndex();
+  viewedRevIndex = realRevIndex(revState);
   renderRevDashboard();
 }
 
@@ -1005,8 +1025,8 @@ function renderRevDashboard(){
   document.getElementById('revJuzTotalNum').textContent = formatJuzAmount(revState.juzTotal);
   document.getElementById('revStreakNum').textContent = ar(revState.streak);
 
-  const real = realRevIndex();
-  renderRevDayStrip(real);
+  const real = realRevIndex(revState);
+  renderRevDayStrip(real, revState);
   renderRevDayDetailAndTasks(cat, real);
 
   const ctaEl = document.getElementById('revAddTrackLink');
@@ -1015,9 +1035,9 @@ function renderRevDashboard(){
     '<button type="button" class="btn btn-secondary" onclick="chooseTrack(\'mem\')">الانتقال إلى خطط الحفظ الجديد</button>';
 }
 
-function renderRevDayStrip(real){
+function renderRevDayStrip(real, state){
   let html = '';
-  REVIEW_WEEKDAYS.forEach((d, idx)=>{
+  reviewWeekdayOrder(state.startDate).forEach((d, idx)=>{
     const isToday = real === idx;
     const isViewed = viewedRevIndex === idx;
     html += `<div class="day-chip ${isToday ? 'today' : ''} ${isViewed ? 'viewed' : ''}" onclick="selectRevIndex(${idx})">
@@ -1041,7 +1061,7 @@ function renderRevDayDetailAndTasks(cat, real){
   const titleEl = document.getElementById('revDayDetailTitle');
   const listEl = document.getElementById('revTaskList');
   const isReal = viewedRevIndex === real;
-  const dayLabel = viewedRevIndex === 'friday' ? 'الجمعة' : REVIEW_WEEKDAYS[viewedRevIndex].name;
+  const dayLabel = viewedRevIndex === 'friday' ? 'الجمعة' : reviewWeekdayOrder(revState.startDate)[viewedRevIndex].name;
 
   titleEl.textContent = dayLabel;
   previewEl.innerHTML = isReal ? '' :
