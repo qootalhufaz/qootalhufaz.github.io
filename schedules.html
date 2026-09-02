@@ -144,7 +144,10 @@
         <div class="eyebrow" id="memGreetTime">مساء الخير</div>
         <h1 id="memGreetName">نبدأ بخطوة مباركة</h1>
       </div>
-      <button class="edit-link" onclick="showMemOnboarding(true)">تعديل</button>
+      <div class="greet-actions">
+        <button class="restart-link" onclick="restartMemPlan()">إعادة البدء</button>
+        <button class="edit-link" onclick="showMemOnboarding(true)">تعديل</button>
+      </div>
     </div>
   </div>
 
@@ -255,7 +258,10 @@
         <div class="eyebrow" id="revGreetTime">مساء الخير</div>
         <h1 id="revGreetName">نبدأ بخطوة مباركة</h1>
       </div>
-      <button class="edit-link" onclick="showRevOnboarding(true)">تعديل</button>
+      <div class="greet-actions">
+        <button class="restart-link" onclick="restartRevPlan()">إعادة البدء</button>
+        <button class="edit-link" onclick="showRevOnboarding(true)">تعديل</button>
+      </div>
     </div>
   </div>
 
@@ -502,6 +508,75 @@ function saveMemOnboarding(){
   lastTrack = 'mem';
   saveJSON(LAST_KEY, lastTrack);
   showMemDashboard();
+}
+
+/* =====================================================================
+   نافذة تأكيد عامة (تُستخدم حاليًا لإعادة بدء أي مسار)
+   ===================================================================== */
+let pendingConfirmAction = null;
+
+function showConfirmModal(title, text, confirmLabel, onConfirm){
+  document.getElementById('confirmModalTitle').textContent = title;
+  document.getElementById('confirmModalText').textContent = text;
+  document.getElementById('confirmModalConfirmBtn').textContent = confirmLabel;
+  pendingConfirmAction = onConfirm;
+  document.getElementById('confirmModal').style.display = 'flex';
+}
+function hideConfirmModal(){
+  document.getElementById('confirmModal').style.display = 'none';
+  pendingConfirmAction = null;
+}
+function confirmModalConfirm(){
+  const action = pendingConfirmAction;
+  hideConfirmModal();
+  if(action) action();
+}
+
+/* =====================================================================
+   إعادة بدء الخطة من جديد (حفظ جديد / مراجعة) — يصفّر التقدّم والسلسلة
+   المتتالية فقط، ويحافظ على الاسم والخطة/الفئة المختارة مسبقًا
+   ===================================================================== */
+function restartMemPlan(){
+  showConfirmModal(
+    'إعادة بدء خطة الحفظ',
+    'رح ترجع تبدأ من اليوم الأول، وينصفّر تقدّمك وسلسلتك المتتالية بخطة الحفظ الجديد. خذ راحتك بالقرار، ولو حابب بس تغيّر اسمك أو الخطة الزمنية فزر "تعديل" يكفيك.',
+    'نعم، ابدأ من جديد',
+    doRestartMemPlan
+  );
+}
+function doRestartMemPlan(){
+  memState = {
+    name: memState.name,
+    planId: memState.planId,
+    startDate: todayStr(),
+    streak: 0,
+    lastStreakDate: null,
+    taskStatus: {date: todayStr(), items:{}}
+  };
+  saveJSON(MEM_KEY, memState);
+  showMemDashboard();
+}
+
+function restartRevPlan(){
+  showConfirmModal(
+    'إعادة بدء خطة المراجعة',
+    'رح تنصفّر سلسلتك المتتالية وتقدّم مسار المراجعة، وترجع تبدأ من جديد. خذ راحتك بالقرار، ولو حابب بس تغيّر الفئة أو عدد الأجزاء فزر "تعديل" يكفيك.',
+    'نعم، ابدأ من جديد',
+    doRestartRevPlan
+  );
+}
+function doRestartRevPlan(){
+  revState = {
+    name: revState.name,
+    categoryId: revState.categoryId,
+    juzTotal: revState.juzTotal,
+    startDate: todayStr(),
+    streak: 0,
+    lastStreakDate: null,
+    taskStatus: {date: todayStr(), items:{}}
+  };
+  saveJSON(REV_KEY, revState);
+  showRevDashboard();
 }
 
 function getMemPlan(state){ return MEM_PLANS_DATA[state.planId]; }
@@ -1042,6 +1117,19 @@ async function init(){
 }
 init();
 </script>
+
+<!-- ============ نافذة تأكيد عامة (تُستخدم لإعادة بدء أي مسار) ============ -->
+<div id="confirmModal" class="modal-overlay" style="display:none;">
+  <div class="modal-box">
+    <div class="modal-icon">🔄</div>
+    <div class="modal-title" id="confirmModalTitle">تأكيد الإجراء</div>
+    <div class="modal-text" id="confirmModalText"></div>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-secondary" onclick="hideConfirmModal()">إلغاء</button>
+      <button type="button" class="btn-confirm" id="confirmModalConfirmBtn" onclick="confirmModalConfirm()">نعم، ابدأ من جديد</button>
+    </div>
+  </div>
+</div>
 
 <a href="share-experience.html" class="share-fab" title="شاركنا تجربتك">💬</a>
 
