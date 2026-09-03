@@ -55,6 +55,7 @@ header{
   max-width:1140px; margin:0 auto;
   display:flex; align-items:center; justify-content:space-between;
   padding:20px 24px;
+  min-height:116px; /* لمنع انزياح CLS أثناء تبديل الخط (font swap) — قيمة محسوبة تقديريًا، تحقق منها بـDevTools */
 }
 .brand{color:var(--gold-light); font-family:'Amiri',serif; font-size:1.7rem; font-weight:700;}
 .brand small{display:block; color:#c7d0da; font-family:'Tajawal',sans-serif; font-size:0.78rem; font-weight:300; letter-spacing:1px; margin-top:2px;}
@@ -63,6 +64,7 @@ nav.main-nav{background:var(--navy);}
 .main-nav ul{
   max-width:1140px; margin:0 auto; padding:0 24px;
   display:flex; list-style:none; gap:2px; flex-wrap:wrap;
+  min-height:57px; /* لمنع انزياح CLS بشريط التنقل (فقط بوضع الديسكتوب — أقل من 820px مخفي بالكامل فلا يتأثر) */
 }
 .main-nav a{
   display:block; padding:14px 18px; color:#dfe6ee; font-size:0.95rem;
@@ -97,6 +99,7 @@ footer{
   background:var(--navy-deep); color:#c7d0da;
   padding:36px 24px; text-align:center; font-size:0.9rem;
   border-top:3px solid var(--gold);
+  min-height:144px; /* لمنع انزياح CLS أثناء تبديل الخط — قيمة لسطر وصف واحد (الديسكتوب)، مُعدَّلة لسطرين بوضع الموبايل بالأسفل */
 }
 footer .brand{color:var(--gold-light); font-family:'Amiri',serif; font-size:1.2rem; display:block; margin-bottom:10px;}
 
@@ -321,9 +324,6 @@ main{max-width:1000px; margin:0 auto; padding:40px 20px 80px;}
 .dash-banner h1 .accent{color:var(--gold-light);}
 .edit-link{background:transparent; border:1.5px solid var(--gold-light); color:var(--gold-light); padding:8px 18px; border-radius:20px; font-size:.85rem; cursor:pointer; font-family:'Tajawal',sans-serif; transition:.2s;}
 .edit-link:hover{background:var(--gold-light); color:var(--navy-deep);}
-.greet-actions{display:flex; gap:8px; flex-wrap:wrap; align-items:center;}
-.restart-link{background:transparent; border:1.5px solid var(--gold-light); color:var(--gold-light); padding:8px 18px; border-radius:20px; font-size:.85rem; cursor:pointer; font-family:'Tajawal',sans-serif; transition:.2s;}
-.restart-link:hover{background:var(--gold-light); color:var(--navy-deep);}
 
 .dash-topbar{max-width:680px; margin:0 auto; padding:16px 20px 0;}
 .back-link{color:var(--navy); font-size:.9rem; font-weight:500;}
@@ -482,6 +482,8 @@ main{max-width:1000px; margin:0 auto; padding:40px 20px 80px;}
   .main-nav.open ul{display:flex;}
   .main-nav a{border-bottom:1px solid rgba(255,255,255,0.08);}
   .main-nav a:hover, .main-nav a.active{border-bottom-color:rgba(255,255,255,0.08);}
+
+  footer{min-height:172px;} /* بوضع الموبايل غالبًا سطرا وصف بدل سطر واحد، فالمساحة المحجوزة أكبر */
 }
 
 @media (max-width:520px){
@@ -722,26 +724,3 @@ main{max-width:1000px; margin:0 auto; padding:40px 20px 80px;}
 .coming-soon h1{ font-size:1.9rem; margin-bottom:14px; }
 .coming-soon p{ color:var(--ink-soft); font-size:1.05rem; margin-bottom:28px; }
 .coming-soon .btn{ display:inline-block; }
-
-/* =====================================================================
-   ١٧) نافذة تأكيد عامة (Modal) — تُستخدم حاليًا لتأكيد إعادة بدء أي خطة
-   ===================================================================== */
-.modal-overlay{
-  position:fixed; inset:0; background:rgba(15,46,33,.55);
-  display:flex; align-items:center; justify-content:center;
-  z-index:200; padding:20px;
-}
-.modal-box{
-  background:var(--panel); border-radius:14px; max-width:380px; width:100%;
-  padding:30px 26px; text-align:center; box-shadow:0 10px 30px rgba(0,0,0,.25);
-}
-.modal-icon{ font-size:2rem; margin-bottom:10px; }
-.modal-title{ font-family:'Amiri', serif; font-size:1.25rem; font-weight:700; color:var(--navy-deep); margin-bottom:10px; }
-.modal-text{ font-size:.92rem; color:var(--ink-soft); line-height:1.8; margin-bottom:24px; }
-.modal-actions{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
-.btn-confirm{
-  background:var(--navy-deep); color:#fff; border:none; padding:10px 22px;
-  border-radius:8px; font-size:.9rem; font-weight:700; cursor:pointer;
-  font-family:'Tajawal',sans-serif; transition:.2s;
-}
-.btn-confirm:hover{ background:var(--navy); }

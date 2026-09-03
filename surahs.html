@@ -148,14 +148,19 @@ document.getElementById('surah-select').addEventListener('change', function(){
   }
 });
 
+let searchDebounceTimer = null;
 document.getElementById('surah-search').addEventListener('input', function(){
-  const query = this.value.trim();
-  if(!query) return;
-  const match = surahsData.find(s => s.الاسم.includes(query));
-  if(match){
-    showSurah(match.id);
-    document.getElementById('surah-select').value = match.id;
-  }
+  clearTimeout(searchDebounceTimer);
+  const value = this.value;
+  searchDebounceTimer = setTimeout(function(){
+    const query = value.trim();
+    if(!query) return;
+    const match = surahsData.find(s => s.الاسم.includes(query));
+    if(match){
+      showSurah(match.id);
+      document.getElementById('surah-select').value = match.id;
+    }
+  }, 150);
 });
 </script>
 
