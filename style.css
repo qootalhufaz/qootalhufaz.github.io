@@ -321,7 +321,9 @@ main{max-width:1000px; margin:0 auto; padding:40px 20px 80px;}
 .dash-banner h1 .accent{color:var(--gold-light);}
 .edit-link{background:transparent; border:1.5px solid var(--gold-light); color:var(--gold-light); padding:8px 18px; border-radius:20px; font-size:.85rem; cursor:pointer; font-family:'Tajawal',sans-serif; transition:.2s;}
 .edit-link:hover{background:var(--gold-light); color:var(--navy-deep);}
-
+.restart-link{background:transparent; border:1.5px solid #d99a8a; color:#d99a8a; padding:8px 18px; border-radius:20px; font-size:.85rem; cursor:pointer; font-family:'Tajawal',sans-serif; transition:.2s;}
+.restart-link:hover{background:#d99a8a; color:var(--navy-deep);}
+.greet-actions{display:flex; gap:10px; align-items:center;}
 .dash-topbar{max-width:680px; margin:0 auto; padding:16px 20px 0;}
 .back-link{color:var(--navy); font-size:.9rem; font-weight:500;}
 .back-link:hover{color:var(--gold);}
