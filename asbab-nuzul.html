@@ -249,6 +249,35 @@ function getAyahsText(surah, from, to){
     document.querySelectorAll('.mushaf-theme-btn').forEach(b => {
       b.classList.toggle('active', b.dataset.theme === theme);
     });
+      let mushafTouchStartX = 0, mushafTouchStartY = 0;
+  let mushafTouchActive = false;
+  const mushafStageEl = document.querySelector('.mushaf-stage');
+  if(mushafStageEl){
+    mushafStageEl.addEventListener('touchstart', (e) => {
+      const panel = document.getElementById('asbabPanel');
+      if(panel && !panel.hidden){ mushafTouchActive = false; return; }
+      if(e.touches.length !== 1){ mushafTouchActive = false; return; }
+      mushafTouchStartX = e.touches[0].clientX;
+      mushafTouchStartY = e.touches[0].clientY;
+      mushafTouchActive = true;
+    }, {passive:true});
+
+    mushafStageEl.addEventListener('touchend', (e) => {
+      if(!mushafTouchActive) return;
+      mushafTouchActive = false;
+      const touch = e.changedTouches[0];
+      const deltaX = touch.clientX - mushafTouchStartX;
+      const deltaY = touch.clientY - mushafTouchStartY;
+      const absX = Math.abs(deltaX);
+      const absY = Math.abs(deltaY);
+      if(absX < 55 || absX < absY * 1.5) return;
+      if(deltaX < 0){
+        loadPage(currentPage + 1);
+      } else {
+        loadPage(currentPage - 1);
+      }
+    }, {passive:true});
+  }
     localStorage.setItem('mushafTheme', theme);
   }
 
