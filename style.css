@@ -834,7 +834,9 @@ main{max-width:1000px; margin:0 auto; padding:40px 20px 80px;}
   background:#faf8f3; border:1px solid var(--line); border-radius:14px;
   padding:34px 26px; box-shadow:0 2px 14px rgba(15,46,33,.08);
   transition:background .2s ease, color .2s ease;
+  touch-action: pan-y;   /* ← هذا السطر الجديد فقط */
 }
+  
 .mushaf-stage[data-theme="sepia"]{ background:#f4ecd8; }
 .mushaf-stage[data-theme="dark"]{ background:#141414; color:#e8dfc8; }
 

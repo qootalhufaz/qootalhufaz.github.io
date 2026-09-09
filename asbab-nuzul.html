@@ -227,7 +227,7 @@ function getAyahsText(surah, from, to){
       const data = await res.json();
       renderPage(data);
     }catch(e){
-      document.getElementById('mushafPage').innerHTML = '<p style="text-align:center;color:var(--ink-soft)">تعذّر تحميل الصفحة، تحقّقي من الاتصال.</p>';
+      document.getElementById('mushafPage').innerHTML = '<p style="text-align:center;color:var(--ink-soft)">تعذّر تحميل الصفحة، تحقّق من الاتصال.</p>';
     }
   }
   async function loadChapters(){
@@ -249,7 +249,17 @@ function getAyahsText(surah, from, to){
     document.querySelectorAll('.mushaf-theme-btn').forEach(b => {
       b.classList.toggle('active', b.dataset.theme === theme);
     });
-      let mushafTouchStartX = 0, mushafTouchStartY = 0;
+     
+    localStorage.setItem('mushafTheme', theme);
+  }
+
+  document.getElementById('mushafPrev').addEventListener('click', () => loadPage(currentPage - 1));
+  document.getElementById('mushafNext').addEventListener('click', () => loadPage(currentPage + 1));
+  document.querySelectorAll('.mushaf-theme-btn').forEach(b => {
+    b.addEventListener('click', () => setTheme(b.dataset.theme));
+  });
+  
+  let mushafTouchStartX = 0, mushafTouchStartY = 0;
   let mushafTouchActive = false;
   const mushafStageEl = document.querySelector('.mushaf-stage');
   if(mushafStageEl){
@@ -278,14 +288,6 @@ function getAyahsText(surah, from, to){
       }
     }, {passive:true});
   }
-    localStorage.setItem('mushafTheme', theme);
-  }
-
-  document.getElementById('mushafPrev').addEventListener('click', () => loadPage(currentPage - 1));
-  document.getElementById('mushafNext').addEventListener('click', () => loadPage(currentPage + 1));
-  document.querySelectorAll('.mushaf-theme-btn').forEach(b => {
-    b.addEventListener('click', () => setTheme(b.dataset.theme));
-  });
 
     setTheme(localStorage.getItem('mushafTheme') || 'light');
   document.getElementById('asbabPanelClose').addEventListener('click', closeAsbabPanel);
