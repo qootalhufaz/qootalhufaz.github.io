@@ -439,13 +439,13 @@
       console.error(err);
     }
   }
-
   function buildWithinSurahOptions(){
-    // نجمع كل أرقام السور الموجودة بأي قسم من الأقسام الثلاثة
+    // نجمع كل أرقام السور الموجودة بأي قسم من الأقسام الثلاثة + السور المكتملة المراجعة كلها
     const surahSet = new Set();
     ['beginnings','middles','endings'].forEach(cat => {
       (withinData[cat] || []).forEach(group => surahSet.add(group.surah));
     });
+    (withinData.processedSurahs || []).forEach(num => surahSet.add(num));
     const surahNumbers = Array.from(surahSet).sort((a,b) => a - b);
 
     withinSurahSelect.innerHTML = '<option value="">اختر سورة...</option>';
@@ -477,11 +477,16 @@
       withinCardsArea.innerHTML = '<div class="within-empty">اختر سورة من الأعلى لعرض متشابهاتها.</div>';
       return;
     }
-    const groups = (withinData[withinCurrentCat] || []).filter(g => String(g.surah) === String(withinCurrentSurah));
+
+       const groups = (withinData[withinCurrentCat] || []).filter(g => String(g.surah) === String(withinCurrentSurah));
     if(groups.length === 0){
-      withinCardsArea.innerHTML = '<div class="within-empty">لا توجد متشابهات مُدخلة بهذا القسم لهذه السورة بعد.</div>';
+      const isProcessed = (withinData.processedSurahs || []).map(String).includes(String(withinCurrentSurah));
+      const catLabels = { beginnings: 'بدايات', middles: 'أواسط', endings: 'نهايات' };
+      withinCardsArea.innerHTML = isProcessed
+        ? `<div class="within-empty">لا توجد بهذه السورة متشابهات بـ${catLabels[withinCurrentCat] || ''} الآيات.</div>`
+        : '<div class="within-empty">بيانات هذه السورة قيد الإعداد.</div>';
       return;
-    }
+    }; 
 
     let html = '';
     groups.forEach((group, idx) => {

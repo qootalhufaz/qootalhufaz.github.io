@@ -28,12 +28,35 @@
   </nav>
 </header>
 
-<section class="coming-soon">
-  <div class="cs-icon">🕊️</div>
-  <h1>أسباب النزول</h1>
-  <p>هذا القسم قيد الإعداد حاليًا، وسيكون متاحًا قريبًا بإذن الله.</p>
-  <a href="index.html" class="btn btn-primary">العودة للرئيسية</a>
+<section class="mushaf-wrap">
+  <div class="mushaf-toolbar">
+    <button id="mushafPrev" class="mushaf-nav-btn">السابقة</button>
+    <select id="mushafSurahSelect" class="mushaf-surah-select" aria-label="اختيار السورة"></select>
+    <div class="mushaf-theme-group">
+      <button class="mushaf-theme-btn" data-theme="light" title="فاتح"></button>
+      <button class="mushaf-theme-btn" data-theme="sepia" title="كريمي"></button>
+      <button class="mushaf-theme-btn" data-theme="dark" title="داكن"></button>
+    </div>
+    <button id="mushafNext" class="mushaf-nav-btn">التالية</button>
+  </div>
+
+  <div class="mushaf-stage" data-theme="light">
+    <div id="mushafPage"></div>
+  </div>
+
+  <p id="mushafInfo" class="mushaf-footer-info"></p>
 </section>
+<div id="asbabOverlay" class="asbab-overlay" hidden></div>
+<aside id="asbabPanel" class="asbab-panel" hidden>
+  <div class="asbab-panel-handle"></div>
+  <div class="asbab-panel-header">
+    <span id="asbabPanelTitle" class="asbab-panel-title"></span>
+    <button id="asbabPanelClose" class="asbab-panel-close" aria-label="إغلاق">✕</button>
+  </div>
+    <div id="asbabVerseText" class="asbab-verse-text"></div>
+  <div id="asbabTabs" class="asbab-tabs"></div>
+  <div id="asbabContent" class="asbab-content"></div>
+</aside>
 
 <footer>
   <span class="brand">قوت الحفاظ</span>
@@ -41,6 +64,238 @@
 </footer>
 
 <a href="share-experience.html" class="share-fab" title="شاركنا تجربتك">💬</a>
+
+<script>
+(function(){
+  const QCF_BASE = 'qcf4/';
+  const TOTAL_PAGES = 604;
+  const injectedFonts = new Set();
+  let currentPage = 1;
+let asbabData = [];
+function loadQuranData(){
+  return fetch('quran.json')
+    .then(r => r.json())
+    .then(d => { quranData = d; })
+    .catch(() => { quranData = []; });
+}
+function getAyahsText(surah, from, to){
+  return quranData
+    .filter(v => v.sura === surah && v.aya >= from && v.aya <= to)
+    .map(v => v.text);
+}
+  const arabicDigits = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+  function toArabicNum(n){
+    return String(n).split('').map(d => /[0-9]/.test(d) ? arabicDigits[+d] : d).join('');
+  }
+  function fontFileName(font){
+    return font === 'QCF4_QBSML' ? 'QCF4_QBSML.woff2' : font + '_W.woff2';
+  }
+  function ensureFontLoaded(font){
+    if(injectedFonts.has(font)) return;
+    injectedFonts.add(font);
+    const style = document.createElement('style');
+    style.textContent = `@font-face{
+      font-family:"${font}";
+      src:url("${QCF_BASE}fonts-woff2/${fontFileName(font)}") format("woff2");
+      font-display:swap;
+    }`;
+    document.head.appendChild(style);
+  }
+  function loadAsbabData(){
+    return fetch('asbab-nuzul.json')
+      .then(r => r.json())
+      .then(d => { asbabData = d; })
+      .catch(() => { asbabData = []; });
+  }
+  function findAsbab(surah, ayah){
+    return asbabData.find(item => item.surah === surah && ayah >= item.from && ayah <= item.to) || null;
+  }
+  function openAsbabPanel(entry){
+    const panel = document.getElementById('asbabPanel');
+    const overlay = document.getElementById('asbabOverlay');
+    const title = document.getElementById('asbabPanelTitle');
+    const tabsEl = document.getElementById('asbabTabs');
+    const contentEl = document.getElementById('asbabContent');
+        const verseTextEl = document.getElementById('asbabVerseText');
+    const ayahsText = getAyahsText(entry.surah, entry.from, entry.to);
+    verseTextEl.innerHTML = ayahsText.map(t => `<p class="asbab-verse-line">${t}</p>`).join('');
+
+    const rangeLabel = entry.from === entry.to
+      ? `آية ${toArabicNum(entry.from)}`
+      : `آيات ${toArabicNum(entry.from)}-${toArabicNum(entry.to)}`;
+    title.textContent = `سبب النزول — ${rangeLabel}`;
+
+    const sources = [
+      {key:'wahidi', label:'الواحدي', data: entry.wahidi},
+      {key:'suyuti', label:'لباب النقول', data: entry.suyuti},
+      {key:'ibn_kathir', label:'ابن كثير', data: entry.ibn_kathir ? [entry.ibn_kathir] : null}
+    ].filter(s => s.data && s.data.length);
+
+    tabsEl.innerHTML = sources.map((s,i) =>
+      `<button class="asbab-tab-btn${i===0?' active':''}" data-key="${s.key}">${s.label}</button>`
+    ).join('');
+
+    function renderTab(key){
+      const src = sources.find(s => s.key === key);
+      contentEl.innerHTML = src.data.map(t => `<p>${t.replace(/\n/g,'<br>')}</p>`).join('');
+    }
+    if(sources.length){ renderTab(sources[0].key); }
+    else { contentEl.innerHTML = '<p style="color:var(--ink-soft)">لا يوجد محتوى متاح حاليًا.</p>'; }
+
+    tabsEl.querySelectorAll('.asbab-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabsEl.querySelectorAll('.asbab-tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderTab(btn.dataset.key);
+      });
+    });
+
+    panel.hidden = false;
+    overlay.hidden = false;
+    requestAnimationFrame(() => {
+      panel.classList.add('open');
+      overlay.classList.add('open');
+    });
+  }
+  function closeAsbabPanel(){
+    const panel = document.getElementById('asbabPanel');
+    const overlay = document.getElementById('asbabOverlay');
+    panel.classList.remove('open');
+    overlay.classList.remove('open');
+    setTimeout(() => { panel.hidden = true; overlay.hidden = true; }, 300);
+  }
+  function renderPage(data){
+    const stage = document.getElementById('mushafPage');
+    stage.innerHTML = '';
+    data.lines.forEach(line => {
+      const lineEl = document.createElement('div');
+      const firstWord = line.words[0];
+      if(firstWord.type === 'surah_header') lineEl.className = 'mushaf-surah-header';
+      else if(firstWord.type === 'bismillah') lineEl.className = 'mushaf-bismillah';
+      else lineEl.className = 'mushaf-line';
+
+    if(firstWord.type === 'bismillah'){
+  ensureFontLoaded(firstWord.font);
+  const span = document.createElement('span');
+  span.className = 'mushaf-word';
+  span.style.fontFamily = `"${firstWord.font}"`;
+  span.textContent = line.words.map(w => w.char).join('');
+  lineEl.appendChild(span);
+} else {
+  line.words.forEach(w => {
+    ensureFontLoaded(w.font);
+    const span = document.createElement('span');
+    span.className = (w.type === 'end') ? 'mushaf-end' : 'mushaf-word';
+    span.style.fontFamily = `"${w.font}"`;
+    span.textContent = w.char;
+    if(w.verse_key) span.dataset.verseKey = w.verse_key;
+        if(w.type === 'end' && w.verse_key){
+      const [sNum, aNum] = w.verse_key.split(':').map(Number);
+      const entry = findAsbab(sNum, aNum);
+      if(entry){
+        span.classList.add('has-asbab');
+        span.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openAsbabPanel(entry);
+        });
+      }
+    }
+    lineEl.appendChild(span);
+    lineEl.appendChild(document.createTextNode(' '));
+  });
+}
+      stage.appendChild(lineEl);
+    });
+
+    const info = document.getElementById('mushafInfo');
+    const surahNames = data.surahs.map(s => s.name_arabic).join(' / ');
+    info.textContent = `الصفحة ${toArabicNum(data.page)} — سورة ${surahNames}`;
+
+    const select = document.getElementById('mushafSurahSelect');
+    const mainSurah = data.surahs[data.surahs.length - 1].id;
+    if(select.value != mainSurah) select.value = mainSurah;
+
+    document.getElementById('mushafPrev').disabled = (data.page <= 1);
+    document.getElementById('mushafNext').disabled = (data.page >= TOTAL_PAGES);
+  }
+  async function loadPage(pageNum){
+    pageNum = Math.min(TOTAL_PAGES, Math.max(1, pageNum));
+    currentPage = pageNum;
+    const padded = String(pageNum).padStart(3, '0');
+    try{
+      const res = await fetch(`${QCF_BASE}pages/${padded}.json`);
+      const data = await res.json();
+      renderPage(data);
+    }catch(e){
+      document.getElementById('mushafPage').innerHTML = '<p style="text-align:center;color:var(--ink-soft)">تعذّر تحميل الصفحة، تحقّقي من الاتصال.</p>';
+    }
+  }
+  async function loadChapters(){
+    try{
+      const res = await fetch(`${QCF_BASE}index.json`);
+      const data = await res.json();
+      const select = document.getElementById('mushafSurahSelect');
+      select.innerHTML = data.chapters.map(c =>
+        `<option value="${c.id}" data-start-page="${c.pages[0]}">${c.name_arabic}</option>`
+      ).join('');
+      select.addEventListener('change', () => {
+        const opt = select.options[select.selectedIndex];
+        loadPage(parseInt(opt.dataset.startPage, 10));
+      });
+    }catch(e){}
+  }
+  function setTheme(theme){
+    document.querySelector('.mushaf-stage').dataset.theme = theme;
+    document.querySelectorAll('.mushaf-theme-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.theme === theme);
+    });
+    localStorage.setItem('mushafTheme', theme);
+  }
+
+  document.getElementById('mushafPrev').addEventListener('click', () => loadPage(currentPage - 1));
+  document.getElementById('mushafNext').addEventListener('click', () => loadPage(currentPage + 1));
+  document.querySelectorAll('.mushaf-theme-btn').forEach(b => {
+    b.addEventListener('click', () => setTheme(b.dataset.theme));
+  });
+
+    setTheme(localStorage.getItem('mushafTheme') || 'light');
+  document.getElementById('asbabPanelClose').addEventListener('click', closeAsbabPanel);
+  document.getElementById('asbabOverlay').addEventListener('click', closeAsbabPanel);
+  document.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape'){
+    const panel = document.getElementById('asbabPanel');
+    if(panel && !panel.hidden) closeAsbabPanel();
+  }
+});
+
+let touchStartY = 0;
+let touchCurrentY = 0;
+const panelHandleEl = document.querySelector('.asbab-panel-handle');
+if(panelHandleEl){
+  panelHandleEl.addEventListener('touchstart', (e) => {
+    touchStartY = e.touches[0].clientY;
+    touchCurrentY = touchStartY;
+  });
+  panelHandleEl.addEventListener('touchmove', (e) => {
+    touchCurrentY = e.touches[0].clientY;
+  });
+  panelHandleEl.addEventListener('touchend', () => {
+    if(touchCurrentY - touchStartY > 60){
+      closeAsbabPanel();
+    }
+    touchStartY = 0;
+    touchCurrentY = 0;
+  });
+}
+    (async function init(){
+    await Promise.all([loadAsbabData(), loadQuranData()]);
+    loadChapters();
+    loadPage(1);
+  })();
+  })();
+</script>
+
+<!-- Cloudflare Web Analytics -->
 
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "39f866db1f5d42de9522ed9c44520408"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
