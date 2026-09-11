@@ -8,25 +8,24 @@
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="asbab-fullscreen">
 
-<header>
-  <div class="top-bar">
-    <div class="brand">قوت الحفاظ<small>كل ما يحتاجه طالب حفظ القرآن الكريم</small></div>
-    <button class="menu-toggle" onclick="document.querySelector('.main-nav').classList.toggle('open')" aria-label="فتح القائمة">☰</button>
-  </div>
-  <nav class="main-nav">
-    <ul>
-      <li><a href="index.html">الرئيسية</a></li>
-      <li><a href="schedules.html">جداول الحفظ والمراجعة</a></li>
-      <li><a href="mutashabihat.html">متشابهات القرآن</a></li>
-      <li><a href="surahs.html">معلومات عن السورة</a></li>
-      <li><a href="asbab-nuzul.html" class="active">أسباب النزول</a></li>
-      <li><a href="dalalat.html">الدلالات اللغوية</a></li>
-      <li><a href="memory-boost.html">تحسين الذاكرة</a></li>
-    </ul>
-  </nav>
+<header class="asbab-header-compact">
+  <a href="index.html" class="asbab-back-btn" aria-label="الرئيسية">🏠</a>
+  <span class="asbab-header-title">أسباب النزول</span>
+  <button class="asbab-menu-toggle" id="asbabMenuToggle" aria-label="فتح القائمة">☰</button>
 </header>
+<div id="asbabMenuOverlay" class="asbab-menu-overlay" hidden>
+  <nav class="asbab-menu-list">
+    <a href="index.html">الرئيسية</a>
+    <a href="schedules.html">جداول الحفظ والمراجعة</a>
+    <a href="mutashabihat.html">متشابهات القرآن</a>
+    <a href="surahs.html">معلومات عن السورة</a>
+    <a href="asbab-nuzul.html" class="active">أسباب النزول</a>
+    <a href="dalalat.html">الدلالات اللغوية</a>
+    <a href="memory-boost.html">تحسين الذاكرة</a>
+  </nav>
+</div>
 
 <section class="mushaf-wrap">
   <div class="mushaf-toolbar">
@@ -37,11 +36,18 @@
       <button class="mushaf-theme-btn" data-theme="sepia" title="كريمي"></button>
       <button class="mushaf-theme-btn" data-theme="dark" title="داكن"></button>
     </div>
+        <select id="colorModeSelect" class="mushaf-color-select" aria-label="وضع التلوين">
+      <option value="off">بدون تلوين</option>
+      <option value="word">تلوين كلمة</option>
+      <option value="verse">تلوين آية</option>
+    </select>
     <button id="mushafNext" class="mushaf-nav-btn">التالية</button>
   </div>
 
-  <div class="mushaf-stage" data-theme="light">
-    <div id="mushafPage"></div>
+   <div class="mushaf-stage" data-theme="light">
+    <div id="mushafScaleWrap">
+      <div id="mushafPage"></div>
+    </div>
   </div>
 
   <p id="mushafInfo" class="mushaf-footer-info"></p>
@@ -57,21 +63,53 @@
   <div id="asbabTabs" class="asbab-tabs"></div>
   <div id="asbabContent" class="asbab-content"></div>
 </aside>
+<div id="colorPopup" class="color-popup" hidden>
+  <button class="color-swatch" data-color="#FDE68A" style="background:#FDE68A"></button>
+  <button class="color-swatch" data-color="#BBF7D0" style="background:#BBF7D0"></button>
+  <button class="color-swatch" data-color="#BFDBFE" style="background:#BFDBFE"></button>
+  <button class="color-swatch" data-color="#FBCFE8" style="background:#FBCFE8"></button>
+  <button class="color-swatch" data-color="#FED7AA" style="background:#FED7AA"></button>
+  <button class="color-swatch color-swatch-clear" data-color="" title="مسح اللون">✕</button>
+</div>
 
-<footer>
-  <span class="brand">قوت الحفاظ</span>
-  نسأل الله أن ينفع به كل طالب حفظ لكتابه الكريم
-</footer>
 
-<a href="share-experience.html" class="share-fab" title="شاركنا تجربتك">💬</a>
+
 
 <script>
 (function(){
-  const QCF_BASE = 'qcf4/';
+   const QCF_BASE = 'qcf4/';
   const TOTAL_PAGES = 604;
-  const injectedFonts = new Set();
+  const injectedFonts = new Map();
+  let pageFontPromises = [];
   let currentPage = 1;
 let asbabData = [];
+let colorMode = 'off';
+let mushafColors = {words:{}, verses:{}};
+
+function loadMushafColors(){
+  try{
+    const raw = localStorage.getItem('mushafColors');
+    mushafColors = raw ? JSON.parse(raw) : {words:{}, verses:{}};
+  }catch(e){ mushafColors = {words:{}, verses:{}}; }
+}
+function saveMushafColors(){
+  localStorage.setItem('mushafColors', JSON.stringify(mushafColors));
+}
+function openColorPopup(span, kind, key){
+  const popup = document.getElementById('colorPopup');
+  const rect = span.getBoundingClientRect();
+  popup.style.top = `${rect.bottom + window.scrollY + 6}px`;
+  popup.style.left = `${rect.left + window.scrollX}px`;
+  popup.hidden = false;
+  popup.dataset.kind = kind;
+  popup.dataset.key = key;
+}
+function closeColorPopup(){
+  const popup = document.getElementById('colorPopup');
+  popup.hidden = true;
+  delete popup.dataset.kind;
+  delete popup.dataset.key;
+}
 function loadQuranData(){
   return fetch('quran.json')
     .then(r => r.json())
@@ -90,16 +128,27 @@ function getAyahsText(surah, from, to){
   function fontFileName(font){
     return font === 'QCF4_QBSML' ? 'QCF4_QBSML.woff2' : font + '_W.woff2';
   }
-  function ensureFontLoaded(font){
-    if(injectedFonts.has(font)) return;
-    injectedFonts.add(font);
-    const style = document.createElement('style');
-    style.textContent = `@font-face{
-      font-family:"${font}";
-      src:url("${QCF_BASE}fonts-woff2/${fontFileName(font)}") format("woff2");
-      font-display:swap;
-    }`;
-    document.head.appendChild(style);
+    function ensureFontLoaded(font){
+    if(injectedFonts.has(font)){
+      pageFontPromises.push(injectedFonts.get(font));
+      return;
+    }
+    const url = `${QCF_BASE}fonts-woff2/${fontFileName(font)}`;
+    let promise;
+    if(window.FontFace){
+      const face = new FontFace(font, `url("${url}")`, {display:'swap'});
+      promise = face.load().then(loadedFace => {
+        document.fonts.add(loadedFace);
+        return loadedFace;
+      }).catch(() => {});
+    } else {
+      const style = document.createElement('style');
+      style.textContent = `@font-face{ font-family:"${font}"; src:url("${url}") format("woff2"); font-display:swap; }`;
+      document.head.appendChild(style);
+      promise = Promise.resolve();
+    }
+    injectedFonts.set(font, promise);
+    pageFontPromises.push(promise);
   }
   function loadAsbabData(){
     return fetch('asbab-nuzul.json')
@@ -164,46 +213,71 @@ function getAyahsText(surah, from, to){
     overlay.classList.remove('open');
     setTimeout(() => { panel.hidden = true; overlay.hidden = true; }, 300);
   }
-  function renderPage(data){
+
+    function renderPage(data){
+      pageFontPromises = [];
     const stage = document.getElementById('mushafPage');
     stage.innerHTML = '';
-    data.lines.forEach(line => {
+    data.lines.forEach((line, lineIdx) => {
       const lineEl = document.createElement('div');
       const firstWord = line.words[0];
       if(firstWord.type === 'surah_header') lineEl.className = 'mushaf-surah-header';
       else if(firstWord.type === 'bismillah') lineEl.className = 'mushaf-bismillah';
       else lineEl.className = 'mushaf-line';
 
-    if(firstWord.type === 'bismillah'){
-  ensureFontLoaded(firstWord.font);
-  const span = document.createElement('span');
-  span.className = 'mushaf-word';
-  span.style.fontFamily = `"${firstWord.font}"`;
-  span.textContent = line.words.map(w => w.char).join('');
-  lineEl.appendChild(span);
-} else {
-  line.words.forEach(w => {
-    ensureFontLoaded(w.font);
-    const span = document.createElement('span');
-    span.className = (w.type === 'end') ? 'mushaf-end' : 'mushaf-word';
-    span.style.fontFamily = `"${w.font}"`;
-    span.textContent = w.char;
-    if(w.verse_key) span.dataset.verseKey = w.verse_key;
-        if(w.type === 'end' && w.verse_key){
-      const [sNum, aNum] = w.verse_key.split(':').map(Number);
-      const entry = findAsbab(sNum, aNum);
-      if(entry){
-        span.classList.add('has-asbab');
-        span.addEventListener('click', (e) => {
-          e.stopPropagation();
-          openAsbabPanel(entry);
+      if(firstWord.type === 'bismillah'){
+        ensureFontLoaded(firstWord.font);
+        const span = document.createElement('span');
+        span.className = 'mushaf-word';
+        span.style.fontFamily = `"${firstWord.font}"`;
+        span.textContent = line.words.map(w => w.char).join('');
+        lineEl.appendChild(span);
+      } else {
+        line.words.forEach((w, wIdx) => {
+          ensureFontLoaded(w.font);
+          const span = document.createElement('span');
+          span.className = (w.type === 'end') ? 'mushaf-end' : 'mushaf-word';
+          span.style.fontFamily = `"${w.font}"`;
+          span.textContent = w.char;
+          if(w.verse_key) span.dataset.verseKey = w.verse_key;
+
+          let bg = '';
+          if(w.verse_key && mushafColors.verses[w.verse_key]) bg = mushafColors.verses[w.verse_key];
+          let wordKey = null;
+          if(w.type !== 'end'){
+            wordKey = `${data.page}-${lineIdx}-${wIdx}`;
+            span.dataset.wordKey = wordKey;
+            if(mushafColors.words[wordKey]) bg = mushafColors.words[wordKey];
+          }
+          if(bg) span.style.backgroundColor = bg;
+
+          if(w.type === 'end' && w.verse_key){
+            const [sNum, aNum] = w.verse_key.split(':').map(Number);
+            const entry = findAsbab(sNum, aNum);
+            if(entry) span.classList.add('has-asbab');
+          }
+
+          span.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if(colorMode === 'word'){
+              if(w.type !== 'end') openColorPopup(span, 'word', wordKey);
+              return;
+            }
+            if(colorMode === 'verse'){
+              if(w.verse_key) openColorPopup(span, 'verse', w.verse_key);
+              return;
+            }
+            if(w.type === 'end' && w.verse_key){
+              const [sNum, aNum] = w.verse_key.split(':').map(Number);
+              const entry = findAsbab(sNum, aNum);
+              if(entry) openAsbabPanel(entry);
+            }
+          });
+
+          lineEl.appendChild(span);
+          lineEl.appendChild(document.createTextNode(' '));
         });
       }
-    }
-    lineEl.appendChild(span);
-    lineEl.appendChild(document.createTextNode(' '));
-  });
-}
       stage.appendChild(lineEl);
     });
 
@@ -217,8 +291,54 @@ function getAyahsText(surah, from, to){
 
     document.getElementById('mushafPrev').disabled = (data.page <= 1);
     document.getElementById('mushafNext').disabled = (data.page >= TOTAL_PAGES);
+      const asbabMenuToggle = document.getElementById('asbabMenuToggle');
+  const asbabMenuOverlay = document.getElementById('asbabMenuOverlay');
+  if(asbabMenuToggle && asbabMenuOverlay){
+    asbabMenuToggle.addEventListener('click', () => { asbabMenuOverlay.hidden = false; });
+    asbabMenuOverlay.addEventListener('click', (e) => {
+      if(e.target === asbabMenuOverlay) asbabMenuOverlay.hidden = true;
+    });
+    asbabMenuOverlay.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => { asbabMenuOverlay.hidden = true; });
+    });
   }
-  async function loadPage(pageNum){
+  }
+       function fitMushafText(){
+    const stage = document.querySelector('.mushaf-stage');
+    const wrap = document.getElementById('mushafScaleWrap');
+    const native = document.getElementById('mushafPage');
+    if(!stage || !wrap || !native) return;
+    native.style.transform = 'scale(1)';
+    wrap.style.width = '';
+    wrap.style.height = '';
+    const nativeW = native.offsetWidth;
+    const nativeH = native.scrollHeight;
+    if(!nativeW || !nativeH) return;
+          const cs = getComputedStyle(stage);
+    const availW = stage.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    const isMobileView = window.innerWidth <= 768;
+    let scale;
+    if(isMobileView){
+      const availH = stage.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+      scale = Math.min(availW / nativeW, availH / nativeH);
+    } else {
+      scale = availW / nativeW;
+    }
+    scale = Math.min(scale, 2.0);
+    scale = Math.max(scale, 0.7);
+       native.style.transform = `scale(${scale})`;
+    wrap.style.width = (nativeW * scale) + 'px';
+    wrap.style.height = (nativeH * scale) + 'px';
+
+    // البسملة تبقى محصورة بحدها الآمن المعروف (١.٣٥) بغض النظر عن تكبير باقي الصفحة
+    const bismillahEl = native.querySelector('.mushaf-bismillah');
+    if(bismillahEl){
+      const SAFE_MAX_SCALE = 1.35;
+      const correction = scale > SAFE_MAX_SCALE ? (SAFE_MAX_SCALE / scale) : 1;
+      bismillahEl.style.transform = `scale(${correction})`;
+    }
+  }
+     async function loadPage(pageNum){
     pageNum = Math.min(TOTAL_PAGES, Math.max(1, pageNum));
     currentPage = pageNum;
     const padded = String(pageNum).padStart(3, '0');
@@ -226,6 +346,8 @@ function getAyahsText(surah, from, to){
       const res = await fetch(`${QCF_BASE}pages/${padded}.json`);
       const data = await res.json();
       renderPage(data);
+      await Promise.all(pageFontPromises).catch(() => {});
+      requestAnimationFrame(() => requestAnimationFrame(fitMushafText));
     }catch(e){
       document.getElementById('mushafPage').innerHTML = '<p style="text-align:center;color:var(--ink-soft)">تعذّر تحميل الصفحة، تحقّق من الاتصال.</p>';
     }
@@ -258,7 +380,7 @@ function getAyahsText(surah, from, to){
   document.querySelectorAll('.mushaf-theme-btn').forEach(b => {
     b.addEventListener('click', () => setTheme(b.dataset.theme));
   });
-  
+
   let mushafTouchStartX = 0, mushafTouchStartY = 0;
   let mushafTouchActive = false;
   const mushafStageEl = document.querySelector('.mushaf-stage');
@@ -290,6 +412,35 @@ function getAyahsText(surah, from, to){
   }
 
     setTheme(localStorage.getItem('mushafTheme') || 'light');
+      document.getElementById('colorModeSelect').addEventListener('change', (e) => {
+    colorMode = e.target.value;
+    closeColorPopup();
+  });
+  document.querySelectorAll('#colorPopup .color-swatch').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const popup = document.getElementById('colorPopup');
+      const kind = popup.dataset.kind;
+      const key = popup.dataset.key;
+      const color = btn.dataset.color || '';
+      if(kind === 'word'){
+        if(color) mushafColors.words[key] = color;
+        else delete mushafColors.words[key];
+      } else if(kind === 'verse'){
+        if(color) mushafColors.verses[key] = color;
+        else delete mushafColors.verses[key];
+      }
+      saveMushafColors();
+      closeColorPopup();
+      loadPage(currentPage);
+    });
+  });
+  document.addEventListener('click', (e) => {
+    const popup = document.getElementById('colorPopup');
+    if(!popup.hidden && !popup.contains(e.target)){
+      closeColorPopup();
+    }
+  });
   document.getElementById('asbabPanelClose').addEventListener('click', closeAsbabPanel);
   document.getElementById('asbabOverlay').addEventListener('click', closeAsbabPanel);
   document.addEventListener('keydown', (e) => {
@@ -316,9 +467,15 @@ if(panelHandleEl){
     }
     touchStartY = 0;
     touchCurrentY = 0;
+    let fitResizeTimer = null;
+window.addEventListener('resize', () => {
+  clearTimeout(fitResizeTimer);
+  fitResizeTimer = setTimeout(fitMushafText, 150);
+}); 
   });
 }
     (async function init(){
+      loadMushafColors();
     await Promise.all([loadAsbabData(), loadQuranData()]);
     loadChapters();
     loadPage(1);
