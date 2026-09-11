@@ -214,91 +214,72 @@ function getAyahsText(surah, from, to){
     setTimeout(() => { panel.hidden = true; overlay.hidden = true; }, 300);
   }
 
-        function renderPage(data){
+      
+          function renderPage(data){
       pageFontPromises = [];
     const stage = document.getElementById('mushafPage');
     stage.innerHTML = '';
-    let flowEl = null;
     data.lines.forEach((line, lineIdx) => {
+      const lineEl = document.createElement('div');
       const firstWord = line.words[0];
+      if(firstWord.type === 'surah_header') lineEl.className = 'mushaf-surah-header';
+      else if(firstWord.type === 'bismillah') lineEl.className = 'mushaf-bismillah';
+      else lineEl.className = 'mushaf-line';
 
-      if(firstWord.type === 'surah_header' || firstWord.type === 'bismillah'){
-        flowEl = null;
-        const lineEl = document.createElement('div');
-        lineEl.className = (firstWord.type === 'surah_header') ? 'mushaf-surah-header' : 'mushaf-bismillah';
-
-        if(firstWord.type === 'bismillah'){
-          ensureFontLoaded(firstWord.font);
-          const span = document.createElement('span');
-          span.className = 'mushaf-word';
-          span.style.fontFamily = `"${firstWord.font}"`;
-          span.textContent = line.words.map(w => w.char).join('');
-          lineEl.appendChild(span);
-        } else {
-          line.words.forEach(w => {
-            ensureFontLoaded(w.font);
-            const span = document.createElement('span');
-            span.className = 'mushaf-word';
-            span.style.fontFamily = `"${w.font}"`;
-            span.textContent = w.char;
-            lineEl.appendChild(span);
-            lineEl.appendChild(document.createTextNode(' '));
-          });
-        }
-        stage.appendChild(lineEl);
-        return;
-      }
-
-      if(!flowEl){
-        flowEl = document.createElement('div');
-        flowEl.className = 'mushaf-line';
-        stage.appendChild(flowEl);
-      }
-
-      line.words.forEach((w, wIdx) => {
-        ensureFontLoaded(w.font);
+      if(firstWord.type === 'bismillah'){
+        ensureFontLoaded(firstWord.font);
         const span = document.createElement('span');
-        span.className = (w.type === 'end') ? 'mushaf-end' : 'mushaf-word';
-        span.style.fontFamily = `"${w.font}"`;
-        span.textContent = w.char;
-        if(w.verse_key) span.dataset.verseKey = w.verse_key;
+        span.className = 'mushaf-word';
+        span.style.fontFamily = `"${firstWord.font}"`;
+        span.textContent = line.words.map(w => w.char).join('');
+        lineEl.appendChild(span);
+      } else {
+        line.words.forEach((w, wIdx) => {
+          ensureFontLoaded(w.font);
+          const span = document.createElement('span');
+          span.className = (w.type === 'end') ? 'mushaf-end' : 'mushaf-word';
+          span.style.fontFamily = `"${w.font}"`;
+          span.textContent = w.char;
+          if(w.verse_key) span.dataset.verseKey = w.verse_key;
 
-        let bg = '';
-        if(w.verse_key && mushafColors.verses[w.verse_key]) bg = mushafColors.verses[w.verse_key];
-        let wordKey = null;
-        if(w.type !== 'end'){
-          wordKey = `${data.page}-${lineIdx}-${wIdx}`;
-          span.dataset.wordKey = wordKey;
-          if(mushafColors.words[wordKey]) bg = mushafColors.words[wordKey];
-        }
-        if(bg) span.style.backgroundColor = bg;
-
-        if(w.type === 'end' && w.verse_key){
-          const [sNum, aNum] = w.verse_key.split(':').map(Number);
-          const entry = findAsbab(sNum, aNum);
-          if(entry) span.classList.add('has-asbab');
-        }
-
-        span.addEventListener('click', (e) => {
-          e.stopPropagation();
-          if(colorMode === 'word'){
-            if(w.type !== 'end') openColorPopup(span, 'word', wordKey);
-            return;
+          let bg = '';
+          if(w.verse_key && mushafColors.verses[w.verse_key]) bg = mushafColors.verses[w.verse_key];
+          let wordKey = null;
+          if(w.type !== 'end'){
+            wordKey = `${data.page}-${lineIdx}-${wIdx}`;
+            span.dataset.wordKey = wordKey;
+            if(mushafColors.words[wordKey]) bg = mushafColors.words[wordKey];
           }
-          if(colorMode === 'verse'){
-            if(w.verse_key) openColorPopup(span, 'verse', w.verse_key);
-            return;
-          }
+          if(bg) span.style.backgroundColor = bg;
+
           if(w.type === 'end' && w.verse_key){
             const [sNum, aNum] = w.verse_key.split(':').map(Number);
             const entry = findAsbab(sNum, aNum);
-            if(entry) openAsbabPanel(entry);
+            if(entry) span.classList.add('has-asbab');
           }
-        });
 
-        flowEl.appendChild(span);
-        flowEl.appendChild(document.createTextNode(' '));
-      });
+          span.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if(colorMode === 'word'){
+              if(w.type !== 'end') openColorPopup(span, 'word', wordKey);
+              return;
+            }
+            if(colorMode === 'verse'){
+              if(w.verse_key) openColorPopup(span, 'verse', w.verse_key);
+              return;
+            }
+            if(w.type === 'end' && w.verse_key){
+              const [sNum, aNum] = w.verse_key.split(':').map(Number);
+              const entry = findAsbab(sNum, aNum);
+              if(entry) openAsbabPanel(entry);
+            }
+          });
+
+          lineEl.appendChild(span);
+          lineEl.appendChild(document.createTextNode(' '));
+        });
+      }
+      stage.appendChild(lineEl);
     });
 
     const info = document.getElementById('mushafInfo');
@@ -367,8 +348,9 @@ function getAyahsText(surah, from, to){
     try{
       const res = await fetch(`${QCF_BASE}pages/${padded}.json`);
       const data = await res.json();
-      renderPage(data);
+            renderPage(data);
       await Promise.all(pageFontPromises).catch(() => {});
+      requestAnimationFrame(() => requestAnimationFrame(fitMushafText));
       
     }catch(e){
       document.getElementById('mushafPage').innerHTML = '<p style="text-align:center;color:var(--ink-soft)">تعذّر تحميل الصفحة، تحقّق من الاتصال.</p>';
@@ -483,12 +465,17 @@ if(panelHandleEl){
   panelHandleEl.addEventListener('touchmove', (e) => {
     touchCurrentY = e.touches[0].clientY;
   });
-    panelHandleEl.addEventListener('touchend', () => {
+     panelHandleEl.addEventListener('touchend', () => {
     if(touchCurrentY - touchStartY > 60){
       closeAsbabPanel();
     }
     touchStartY = 0;
     touchCurrentY = 0;
+    let fitResizeTimer = null;
+window.addEventListener('resize', () => {
+  clearTimeout(fitResizeTimer);
+  fitResizeTimer = setTimeout(fitMushafText, 150);
+}); 
   });
 }
     (async function init(){
