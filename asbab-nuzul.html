@@ -324,7 +324,7 @@ function getAyahsText(surah, from, to){
     } else {
       scale = availW / nativeW;
     }
-    scale = Math.min(scale, 2.0);
+    scale = Math.min(scale, 1.8);
     scale = Math.max(scale, 0.7);
        native.style.transform = `scale(${scale})`;
     wrap.style.width = (nativeW * scale) + 'px';
