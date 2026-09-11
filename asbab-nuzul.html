@@ -316,7 +316,7 @@ function getAyahsText(surah, from, to){
     if(!nativeW || !nativeH) return;
           const cs = getComputedStyle(stage);
     const availW = stage.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
-    const isMobileView = window.innerWidth <= 768;
+   const isMobileView = window.innerWidth <= 768;
     let scale;
     if(isMobileView){
       const availH = stage.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
