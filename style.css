@@ -849,7 +849,7 @@ main{max-width:1000px; margin:0 auto; padding:40px 20px 80px;}
   margin:18px 0 26px;
   padding:8px 0;
 }
-.mushaf-line{ text-align:center; font: size 2.1em;; line-height:2.5; direction:rtl; unicode-bidi:bidi-override;white-space:nowrap; }
+.mushaf-line{ text-align:justify; text-align-last:right; font-size:2.1rem; line-height:2.5; direction:rtl; unicode-bidi:bidi-override; }
 .mushaf-surah-header{ direction:rtl; unicode-bidi:bidi-override; }
 .mushaf-bismillah{ direction:rtl; unicode-bidi:bidi-override; }
 .mushaf-word{ display:inline; direction:rtl; unicode-bidi:bidi-override; }
@@ -1020,7 +1020,6 @@ body.asbab-fullscreen .mushaf-toolbar{
 }
 body.asbab-fullscreen .mushaf-stage{
   flex:1; min-height:0; overflow-y:hidden; overflow-x:hidden;
-  display:flex; flex-direction:row; justify-content:center; align-items:flex-start; text-align:center;
   padding:14px 20px;
 }
 @media (min-width:769px){
