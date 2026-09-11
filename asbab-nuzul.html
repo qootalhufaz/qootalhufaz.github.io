@@ -321,11 +321,13 @@ function getAyahsText(surah, from, to){
     if(isMobileView){
       const availH = stage.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
       scale = Math.min(availW / nativeW, availH / nativeH);
+      scale = Math.min(scale, 1.35);
+      scale = Math.max(scale, 0.5);
     } else {
       scale = availW / nativeW;
+      scale = Math.min(scale, 2.0);
+      scale = Math.max(scale, 0.7);
     }
-    scale = Math.min(scale, 2.0);
-    scale = Math.max(scale, 0.7);
        native.style.transform = `scale(${scale})`;
     wrap.style.width = (nativeW * scale) + 'px';
     wrap.style.height = (nativeH * scale) + 'px';
