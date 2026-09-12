@@ -78,7 +78,7 @@
   /* توسيط بدل justify+last-right — يمنع انزياح السطور القصيرة (الفاتحة/بداية البقرة) لليمين */
   text-align:center;
   direction:rtl; unicode-bidi:bidi-override; white-space:nowrap;
-  font-size:clamp(1.05rem,4.3vw,1.95rem); line-height:2.5;
+  font-size:clamp(1.05rem,4.8vw,1.7rem); line-height:2.35;
 }
 .an-word{ display:inline; direction:rtl; unicode-bidi:bidi-override; }
 .an-end{ display:inline; font-size:1.6em; vertical-align:-2px; direction:rtl; unicode-bidi:bidi-override; }
@@ -192,7 +192,8 @@
       <button class="an-theme-btn" data-theme="sepia" title="كريمي"></button>
       <button class="an-theme-btn" data-theme="dark" title="داكن"></button>
     </div>
-    <button id="anNext" class="an-nav-btn">التالية</button>
+      <button id="anNext" class="an-nav-btn">التالية</button>
+      <button id="anGharibBtn" class="an-nav-btn" title="معاني الكلمات">📖 المعاني</button>
   </div>
 
   <div id="anStage" class="an-stage" data-theme="light">
@@ -223,6 +224,9 @@
   let currentPage = 1;
   let asbabData = [];
   let quranData = [];
+  let gharibData = [];
+  let currentPageAyahs = new Set();
+
 
   const arabicDigits = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
   function toArabicNum(n){
@@ -265,6 +269,12 @@
       .then(r => r.json())
       .then(d => { quranData = d; })
       .catch(() => { quranData = []; });
+  }
+    function loadGharibData(){
+    return fetch('gharib-quran.json')
+      .then(r => r.json())
+      .then(d => { gharibData = d; })
+      .catch(() => { gharibData = []; });
   }
   function findAsbab(surah, ayah){
     return asbabData.find(item => item.surah === surah && ayah >= item.from && ayah <= item.to) || null;
@@ -337,6 +347,7 @@
 
   function renderPage(data){
     pageFontPromises = [];
+    currentPageAyahs = new Set();
     const stage = document.getElementById('anPage');
     stage.innerHTML = '';
 
@@ -357,6 +368,7 @@
       } else {
         line.words.forEach(w => {
           ensureFontLoaded(w.font);
+         if(w.verse_key) currentPageAyahs.add(w.verse_key);
           const span = document.createElement('span');
           span.className = (w.type === 'end') ? 'an-end' : 'an-word';
           span.style.fontFamily = `"${w.font}"`;
@@ -441,6 +453,7 @@
 
   document.getElementById('anPrev').addEventListener('click', () => loadPage(currentPage - 1));
   document.getElementById('anNext').addEventListener('click', () => loadPage(currentPage + 1));
+  document.getElementById('anGharibBtn').addEventListener('click', openGharibPanel);
   document.querySelectorAll('.an-theme-btn').forEach(b => {
     b.addEventListener('click', () => setTheme(b.dataset.theme));
   });
@@ -482,6 +495,34 @@
     }
   });
 
+  function getPageGharib(){
+    return gharibData.filter(item => currentPageAyahs.has(`${item.surah}:${item.ayah}`));
+  }
+  function openGharibPanel(){
+    const panel = document.getElementById('anPanel');
+    const overlay = document.getElementById('anOverlay');
+    const title = document.getElementById('anPanelTitle');
+    const verseTextEl = document.getElementById('anVerseText');
+    const tabsEl = document.getElementById('anTabs');
+    const contentEl = document.getElementById('anContent');
+
+    title.textContent = `معاني كلمات هذه الصفحة`;
+    verseTextEl.innerHTML = '';
+    tabsEl.innerHTML = '';
+
+    const items = getPageGharib();
+    contentEl.innerHTML = items.length
+      ? items.map(it => `<p><b>${it.word}</b> (آية ${toArabicNum(it.ayah)}): ${it.meaning}</p>`).join('')
+      : '<p>لا توجد معاني كلمات لهذه الصفحة حسب مصدر السراج في غريب القرآن.</p>';
+
+    panel.hidden = false;
+    overlay.hidden = false;
+    requestAnimationFrame(() => {
+      panel.classList.add('open');
+      overlay.classList.add('open');
+    });
+  }
+
   let panelTouchStartY = 0, panelTouchCurrentY = 0;
   const panelHandleEl = document.querySelector('.an-panel-handle');
   if(panelHandleEl){
@@ -516,7 +557,7 @@
   init();
   async function init(){
     setTheme(localStorage.getItem('mushafTheme') || 'light');
-    await Promise.all([loadAsbabData(), loadQuranData()]);
+    await Promise.all([loadAsbabData(), loadQuranData(), loadGharibData()]);
     await loadChapters();
     await loadPage(1);
   }
