@@ -162,6 +162,16 @@
 }
 .an-content p{ margin:0 0 14px; }
 .an-content p:last-child{ margin-bottom:0; }
+
+.an-source-link{
+  display:block;
+  font-size:.78rem;
+  color:var(--gold);
+  margin:-8px 0 16px;
+  text-decoration:none;
+}
+.an-source-link:hover{ text-decoration:underline; }
+
 </style>
 </head>
 <body>
@@ -285,6 +295,8 @@
       .map(v => v.text);
   }
 
+  const BOOK_IDS = { wahidi: {id:11314, offset:3}, suyuti: {id:2247, offset:2} };
+
   function renderTabs(entry){
     const tabsEl = document.getElementById('anTabs');
     const contentEl = document.getElementById('anContent');
@@ -298,10 +310,28 @@
       `<button class="an-tab-btn${i===0?' active':''}" data-key="${s.key}">${s.label}</button>`
     ).join('');
 
-    function renderContent(key){
+    
+  
+function renderContent(key){
       const src = sources.find(s => s.key === key);
-      contentEl.innerHTML = src ? src.data.map(t => `<p>${t.replace(/\n/g,'<br>')}</p>`).join('') : '';
+      if(!src){ contentEl.innerHTML = ''; return; }
+
+      if(key === 'ibn_kathir'){
+        const link = `https://quran.com/${entry.surah}:${entry.from}/tafsirs/ar-tafsir-ibn-kathir`;
+        contentEl.innerHTML = src.data.map(t => `<p>${t.replace(/\n/g,'<br>')}</p>`).join('')
+          + `<a href="${link}" target="_blank" rel="noopener" class="an-source-link">📖 المصدر: quran.com</a>`;
+      } else {
+              const book = BOOK_IDS[key];
+        contentEl.innerHTML = src.data.map(item => {
+          const link = item.page
+            ? `<a href="https://shamela.ws/book/${book.id}/${item.page - book.offset}" target="_blank" rel="noopener" class="an-source-link">📖 المصدر: الشاملة، ص${toArabicNum(item.page)}</a>`
+            : '';
+          return `<p>${item.text.replace(/\n/g,'<br>')}</p>${link}`;
+        }).join('');
+      }
     }
+
+
     if(sources.length){ renderContent(sources[0].key); }
     else { contentEl.innerHTML = '<p style="color:var(--ink-soft)">لا يوجد محتوى متاح حاليًا.</p>'; }
 
@@ -321,7 +351,8 @@
     const verseTextEl = document.getElementById('anVerseText');
 
     const ayahsText = getAyahsText(entry.surah, entry.from, entry.to);
-    verseTextEl.innerHTML = ayahsText.map(t => `<p class="an-verse-line">${t}</p>`).join('');
+const preview = ayahsText.length ? ayahsText[0].split(/\s+/).slice(0,2).join(' ') : '';
+verseTextEl.innerHTML = preview ? `<p class="an-verse-line">﴿${preview}...﴾</p>` : '';
 
     const rangeLabel = entry.from === entry.to
       ? `آية ${toArabicNum(entry.from)}`
@@ -332,6 +363,7 @@
 
     panel.hidden = false;
     overlay.hidden = false;
+  
     requestAnimationFrame(() => {
       panel.classList.add('open');
       overlay.classList.add('open');
@@ -506,7 +538,7 @@
     const tabsEl = document.getElementById('anTabs');
     const contentEl = document.getElementById('anContent');
 
-    title.textContent = `معاني كلمات هذه الصفحة`;
+    title.textContent = `المصدر:السراج في بيان غريب القران للخضيري`;
     verseTextEl.innerHTML = '';
     tabsEl.innerHTML = '';
 
