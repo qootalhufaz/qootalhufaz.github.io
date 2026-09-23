@@ -1042,3 +1042,39 @@ body.asbab-fullscreen #mushafPage{
   position:absolute; top:0; left:0;
   transform-origin: top left;
 }
+/* =======================================================
+تعديلات على شكل صفحة اسباب النزول وقائمة السور 22
+========================================================== */
+.an-nav-arrow{ font-size:1.1rem; padding:8px 16px; }
+
+.an-index-goto{ display:flex; gap:8px; margin-bottom:10px; }
+.an-index-goto input{
+  flex:1; padding:9px 12px; border:1.5px solid var(--line); border-radius:8px;
+  font-family:'Tajawal',sans-serif; font-size:.92rem; background:#fff; color:var(--ink);
+}
+.an-index-goto input:focus{ outline:none; border-color:var(--gold); }
+.an-index-goto button{
+  background:var(--navy-deep); color:#fff; border:none; padding:0 16px;
+  border-radius:8px; font-family:'Tajawal',sans-serif; font-size:.85rem; cursor:pointer;
+}
+.an-index-goto button:hover{ background:var(--navy); }
+.an-index-search:focus{ outline:none; border-color:var(--gold); }
+.an-index-row{
+  display:flex; justify-content:space-between; align-items:center;
+  padding:10px 4px; border-bottom:1px solid var(--line);
+  cursor:pointer; font-family:'Tajawal',sans-serif; font-size:.92rem; color:var(--ink);
+}
+.an-index-row:hover{ background:var(--green-tint); }
+.an-index-row .num{ color:var(--ink-soft); font-size:.82rem; }
+.an-juz-grid{ display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+.an-juz-btn{
+  background:var(--green-tint); border:1px solid var(--line); border-radius:8px;
+  padding:10px 0; text-align:center; cursor:pointer;
+  font-family:'Tajawal',sans-serif; font-size:.9rem; color:var(--navy-deep);
+}
+.an-juz-btn:hover{ border-color:var(--gold); }
+.an-page-num-editable{ cursor:pointer; border-bottom:1px dashed var(--gold); padding-bottom:1px; }
+.an-page-num-input{
+  width:50px; text-align:center; font-family:'Tajawal',sans-serif;
+  border:1.5px solid var(--gold); border-radius:6px; padding:2px 4px; font-size:.85rem;
+}

@@ -194,15 +194,15 @@
 </div>
 
 <section class="an-wrap">
-  <div class="an-toolbar">
-    <button id="anPrev" class="an-nav-btn">السابقة</button>
-    <select id="anSurahSelect" class="an-surah-select" aria-label="اختيار السورة"></select>
+    <div class="an-toolbar">
+    <button id="anPrev" class="an-nav-btn an-nav-arrow" aria-label="الصفحة السابقة">→</button>
+    <button id="anIndexBtn" class="an-nav-btn" title="الفهرس">📑 فهرس</button>
     <div class="an-theme-group">
       <button class="an-theme-btn" data-theme="light" title="فاتح"></button>
       <button class="an-theme-btn" data-theme="sepia" title="كريمي"></button>
       <button class="an-theme-btn" data-theme="dark" title="داكن"></button>
     </div>
-      <button id="anNext" class="an-nav-btn">التالية</button>
+      <button id="anNext" class="an-nav-btn an-nav-arrow" aria-label="الصفحة التالية">←</button>
       <button id="anGharibBtn" class="an-nav-btn" title="معاني الكلمات">📖 المعاني</button>
   </div>
 
@@ -439,11 +439,10 @@ verseTextEl.innerHTML = preview ? `<p class="an-verse-line">﴿${preview}...﴾<
 
     const info = document.getElementById('anInfo');
     const surahNames = data.surahs.map(s => s.name_arabic).join(' / ');
-    info.textContent = `الصفحة ${toArabicNum(data.page)} — سورة ${surahNames}`;
+        info.innerHTML = `الصفحة <span id="anPageNumSpan" class="an-page-num-editable">${toArabicNum(data.page)}</span> — سورة ${surahNames}`;
+    document.getElementById('anPageNumSpan').addEventListener('click', enablePageNumEdit);
 
-    const select = document.getElementById('anSurahSelect');
-    const mainSurah = data.surahs[data.surahs.length - 1].id;
-    if(select.value != mainSurah) select.value = mainSurah;
+    
 
     document.getElementById('anPrev').disabled = (data.page <= 1);
     document.getElementById('anNext').disabled = (data.page >= TOTAL_PAGES);
@@ -463,19 +462,13 @@ verseTextEl.innerHTML = preview ? `<p class="an-verse-line">﴿${preview}...﴾<
     }
   }
 
+   let chaptersData = [];
   async function loadChapters(){
     try{
       const res = await fetch(`${QCF_BASE}index.json`);
       const data = await res.json();
-      const select = document.getElementById('anSurahSelect');
-      select.innerHTML = data.chapters.map(c =>
-        `<option value="${c.id}" data-start-page="${c.pages[0]}">${c.name_arabic}</option>`
-      ).join('');
-      select.addEventListener('change', () => {
-        const opt = select.options[select.selectedIndex];
-        loadPage(parseInt(opt.dataset.startPage, 10));
-      });
-    }catch(e){}
+      chaptersData = data.chapters;
+    }catch(e){ chaptersData = []; }
   }
 
   function setTheme(theme){
@@ -488,6 +481,7 @@ verseTextEl.innerHTML = preview ? `<p class="an-verse-line">﴿${preview}...﴾<
 
   document.getElementById('anPrev').addEventListener('click', () => loadPage(currentPage - 1));
   document.getElementById('anNext').addEventListener('click', () => loadPage(currentPage + 1));
+  document.getElementById('anIndexBtn').addEventListener('click', openIndexPanel);
   document.getElementById('anGharibBtn').addEventListener('click', openGharibPanel);
   document.querySelectorAll('.an-theme-btn').forEach(b => {
     b.addEventListener('click', () => setTheme(b.dataset.theme));
@@ -557,6 +551,109 @@ verseTextEl.innerHTML = preview ? `<p class="an-verse-line">﴿${preview}...﴾<
       overlay.classList.add('open');
     });
   }
+    const JUZ_START_PAGES = [1,22,42,62,82,102,121,142,162,182,201,222,242,262,282,302,322,342,362,382,402,422,442,462,482,502,522,542,562,582];
+
+  function enablePageNumEdit(){
+    const span = document.getElementById('anPageNumSpan');
+    if(!span) return;
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.min = 1;
+    input.max = TOTAL_PAGES;
+    input.value = currentPage;
+    input.className = 'an-page-num-input';
+    span.replaceWith(input);
+    input.focus();
+    input.select();
+    function commit(){
+      const n = parseInt(input.value, 10);
+      if(n >= 1 && n <= TOTAL_PAGES) loadPage(n);
+      else loadPage(currentPage);
+    }
+    input.addEventListener('keydown', (e) => {
+      if(e.key === 'Enter') commit();
+      if(e.key === 'Escape') loadPage(currentPage);
+    });
+    input.addEventListener('blur', commit);
+  }
+
+  function renderIndexPanel(){
+    const tabsEl = document.getElementById('anTabs');
+    const contentEl = document.getElementById('anContent');
+    document.getElementById('anPanelTitle').textContent = 'الفهرس';
+    document.getElementById('anVerseText').innerHTML = '';
+
+    tabsEl.innerHTML = `
+      <button class="an-tab-btn active" data-key="surahs">السور</button>
+      <button class="an-tab-btn" data-key="juz">الأجزاء</button>
+    `;
+
+       function renderSurahsTab(){
+      const rows = chaptersData
+        .map(c => `<div class="an-index-row" data-page="${c.pages[0]}"><span>${c.name_arabic}</span><span class="num">${toArabicNum(c.id)}</span></div>`)
+        .join('');
+      contentEl.innerHTML = `
+        <div class="an-index-goto">
+          <input type="number" min="1" max="${TOTAL_PAGES}" placeholder="اذهب إلى صفحة رقم..." id="anGotoPageInput">
+          <button id="anGotoPageBtn">اذهب</button>
+        </div>
+        <div class="an-index-list" id="anIndexList">${rows}</div>
+      `;
+      function goto(){
+        const n = parseInt(document.getElementById('anGotoPageInput').value, 10);
+        if(n >= 1 && n <= TOTAL_PAGES){
+          loadPage(n);
+          closeAnPanel();
+        }
+      }
+      document.getElementById('anGotoPageBtn').addEventListener('click', goto);
+      document.getElementById('anGotoPageInput').addEventListener('keydown', (e) => {
+        if(e.key === 'Enter') goto();
+      });
+      document.getElementById('anIndexList').querySelectorAll('.an-index-row').forEach(row => {
+        row.addEventListener('click', () => {
+          loadPage(parseInt(row.dataset.page, 10));
+          closeAnPanel();
+        });
+      });
+    }
+
+    function renderJuzTab(){
+      const cells = JUZ_START_PAGES.map((p, i) =>
+        `<div class="an-juz-btn" data-page="${p}">${toArabicNum(i+1)}</div>`
+      ).join('');
+      contentEl.innerHTML = `<div class="an-juz-grid">${cells}</div>`;
+      contentEl.querySelectorAll('.an-juz-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          loadPage(parseInt(btn.dataset.page, 10));
+          closeAnPanel();
+        });
+      });
+    }
+
+    renderSurahsTab();
+
+    tabsEl.querySelectorAll('.an-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabsEl.querySelectorAll('.an-tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        if(btn.dataset.key === 'surahs') renderSurahsTab();
+        else renderJuzTab();
+      });
+    });
+  }
+
+  function openIndexPanel(){
+    renderIndexPanel();
+    const panel = document.getElementById('anPanel');
+    const overlay = document.getElementById('anOverlay');
+    panel.hidden = false;
+    overlay.hidden = false;
+    requestAnimationFrame(() => {
+      panel.classList.add('open');
+      overlay.classList.add('open');
+    });
+  }
 
   let panelTouchStartY = 0, panelTouchCurrentY = 0;
   const panelHandleEl = document.querySelector('.an-panel-handle');
@@ -589,12 +686,13 @@ verseTextEl.innerHTML = preview ? `<p class="an-verse-line">﴿${preview}...﴾<
     });
   }
 
-  init();
+    init();
   async function init(){
     setTheme(localStorage.getItem('mushafTheme') || 'light');
-    await Promise.all([loadAsbabData(), loadQuranData(), loadGharibData()]);
-    await loadChapters();
+    await Promise.all([loadAsbabData(), loadChapters()]);
     await loadPage(1);
+    loadQuranData();   // تبدأ بالتحميل فقط بعد ظهور الصفحة الأولى فعليًا
+    loadGharibData();  // نفس الشي
   }
 })();
 </script>
