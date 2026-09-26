@@ -439,10 +439,7 @@ verseTextEl.innerHTML = preview ? `<p class="an-verse-line">﴿${preview}...﴾<
 
     const info = document.getElementById('anInfo');
     const surahNames = data.surahs.map(s => s.name_arabic).join(' / ');
-        info.innerHTML = `الصفحة <span id="anPageNumSpan" class="an-page-num-editable">${toArabicNum(data.page)}</span> — سورة ${surahNames}`;
-    document.getElementById('anPageNumSpan').addEventListener('click', enablePageNumEdit);
-
-    
+    info.textContent = `الصفحة ${toArabicNum(data.page)} — سورة ${surahNames}`;
 
     document.getElementById('anPrev').disabled = (data.page <= 1);
     document.getElementById('anNext').disabled = (data.page >= TOTAL_PAGES);
@@ -553,29 +550,6 @@ verseTextEl.innerHTML = preview ? `<p class="an-verse-line">﴿${preview}...﴾<
   }
     const JUZ_START_PAGES = [1,22,42,62,82,102,121,142,162,182,201,222,242,262,282,302,322,342,362,382,402,422,442,462,482,502,522,542,562,582];
 
-  function enablePageNumEdit(){
-    const span = document.getElementById('anPageNumSpan');
-    if(!span) return;
-    const input = document.createElement('input');
-    input.type = 'number';
-    input.min = 1;
-    input.max = TOTAL_PAGES;
-    input.value = currentPage;
-    input.className = 'an-page-num-input';
-    span.replaceWith(input);
-    input.focus();
-    input.select();
-    function commit(){
-      const n = parseInt(input.value, 10);
-      if(n >= 1 && n <= TOTAL_PAGES) loadPage(n);
-      else loadPage(currentPage);
-    }
-    input.addEventListener('keydown', (e) => {
-      if(e.key === 'Enter') commit();
-      if(e.key === 'Escape') loadPage(currentPage);
-    });
-    input.addEventListener('blur', commit);
-  }
 
   function renderIndexPanel(){
     const tabsEl = document.getElementById('anTabs');
